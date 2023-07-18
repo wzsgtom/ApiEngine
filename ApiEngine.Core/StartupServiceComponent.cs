@@ -21,7 +21,7 @@ public sealed class StartupServiceComponent : IServiceComponent
         // 审计
         services.AddMvcFilter<AuditFilter>();
         // 控制器.设置JSON.规范化结果
-        services.AddControllers().AddNewtonsoftJson(SetJsonOptions).AddInjectWithUnifyResult();
+        services.AddControllers().AddNewtonsoftJson(SetJsonOptions).AddInjectWithUnifyResult<ResultProvider>();
         // 定时任务
         SetSchedule(services);
         // 任务队列
