@@ -1,0 +1,49 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <SatelliteResourceLanguages>zh</SatelliteResourceLanguages>
+        <NoWarn>1701;1702;1591;IDE1006;CA1822</NoWarn>
+        <DocumentationFile></DocumentationFile>
+        <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+        <GenerateDocumentationFile>True</GenerateDocumentationFile>
+        <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
+        <Authors>xavier</Authors>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+        <DebugType>portable</DebugType>
+        <Optimize>False</Optimize>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+        <DebugType>portable</DebugType>
+        <Optimize>True</Optimize>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="AspNetCoreRateLimit" Version="5.0.0" />
+        <PackageReference Include="Furion.Extras.Authentication.JwtBearer" Version="4.8.8.38" />
+        <PackageReference Include="Furion.Extras.ObjectMapper.Mapster" Version="4.8.8.38" />
+        <PackageReference Include="Furion.Pure" Version="4.8.8.38" />
+        <PackageReference Include="LogDashboard" Version="1.4.8" />
+        <PackageReference Include="NLog.Database" Version="5.2.2" />
+        <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.2" />
+        <PackageReference Include="SqlSugarCoreNoDrive" Version="5.1.4.91" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Update="nlog-db.config">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        </None>
+        <None Update="nlog-file.config">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        </None>
+    </ItemGroup>
+
+</Project>

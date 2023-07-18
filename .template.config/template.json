@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "xavier",
+  "classifications": ["Web/WebAPI"],
+  "name": "ApiEngine",
+  "identity": "ApiEngine",
+  "shortName": "apitpl",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "sourceName": "ApiEngine",
+  "preferNameDirectory": true
+}

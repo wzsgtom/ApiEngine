@@ -1,0 +1,66 @@
+﻿{
+  "$schema": "https://gitee.com/dotnetchina/Furion/raw/net6/schemas/v3/furion-schema.json",
+  "AppSettings": {
+    "InjectSpecificationDocument": true,
+    "InjectMiniProfiler": true
+  },
+  "DynamicApiControllerSettings": {
+    // 默认路由前缀，string，默认 api
+    "DefaultRoutePrefix": "api",
+    "KeepVerb": true,
+    // 路由参数采用 [FromQuery] 化，默认 false（[FromRoute] 方式）
+    "UrlParameterization": true
+  },
+  "CorsAccessorSettings": {
+    "WithExposedHeaders": [
+      "access-token",
+      "x-access-token",
+      "environment"
+    ]
+  },
+  "JWTSettings": {
+    // 是否验证密钥，bool 类型，默认true
+    "ValidateIssuerSigningKey": true,
+    // 密钥，string 类型，必须是复杂密钥，长度大于16
+    "IssuerSigningKey": "YNbeHR7K8nV3fQGl",
+    // 是否验证签发方，bool 类型，默认true
+    "ValidateIssuer": true,
+    // 签发方，string 类型
+    "ValidIssuer": "xhsoft.api",
+    // 是否验证签收方，bool 类型，默认true
+    "ValidateAudience": true,
+    // 签收方，string 类型
+    "ValidAudience": "xhsoft.app",
+    // 是否验证过期时间，bool 类型，默认true，建议true
+    "ValidateLifetime": true,
+    // 过期时间，long 类型，单位分钟，默认20分钟
+    "ExpiredTime": 60,
+    // 过期时间容错值，long 类型，单位秒，默认 5秒
+    "ClockSkew": 5
+  },
+  "ValidationTypeMessageSettings": {
+    "Definitions": [
+      [
+        "Required",
+        "值不能为空或Null"
+      ]
+    ]
+  },
+  "FriendlyExceptionSettings": {
+    "DefaultErrorMessage": "系统异常，请联系管理员",
+    "LogError": false
+  },
+  "SpecificationDocumentSettings": {
+    "DocumentTitle": "API文档",
+    "DocExpansionState": "None",
+    "GroupOpenApiInfos": [
+      {
+        "Group": "Default",
+        "Contact": {
+          "Name": "查看日志（LogDashboard）",
+          "Url": "/LogDashboard/Dashboard/BasicLog"
+        }
+      }
+    ]
+  }
+}

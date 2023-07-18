@@ -1,0 +1,1 @@
+Serve.Run(RunOptions.Default.InjectCore().WithArgs(args));
