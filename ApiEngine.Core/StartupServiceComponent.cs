@@ -22,6 +22,8 @@ public sealed class StartupServiceComponent : IServiceComponent
         services.AddMvcFilter<AuditFilter>();
         // 控制器.设置JSON.规范化结果
         services.AddControllers().AddNewtonsoftJson(SetJsonOptions).AddInjectWithUnifyResult<ResultProvider>();
+        // 响应压缩
+        SetResponseCompression(services);
         // 定时任务
         SetSchedule(services);
         // 任务队列
@@ -78,6 +80,27 @@ public sealed class StartupServiceComponent : IServiceComponent
 
         services.AddSingleton<ISqlSugarClient>(sugar);
         services.AddScoped(typeof(Repository<>));
+    }
+
+    /// <summary>
+    ///     响应压缩
+    /// </summary>
+    /// <param name="services"></param>
+    private static void SetResponseCompression(IServiceCollection services)
+    {
+        services.AddResponseCompression(options =>
+        {
+            // 可以添加多种压缩类型，程序会根据级别自动获取最优方式
+            options.Providers.Add<BrotliCompressionProvider>();
+            options.Providers.Add<GzipCompressionProvider>();
+            // 针对指定的 MimeTypes 使用压缩策略
+            options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/json" });
+            options.EnableForHttps = true;
+        });
+
+        // 针对不同的压缩类型，设置对应的压缩级别
+        services.Configure<BrotliCompressionProviderOptions>(options => options.Level = CompressionLevel.Fastest);
+        services.Configure<GzipCompressionProviderOptions>(options => options.Level = CompressionLevel.Fastest);
     }
 
     /// <summary>

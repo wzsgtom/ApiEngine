@@ -29,11 +29,13 @@ public sealed class StartupApplicationComponent : IApplicationComponent
         app.UseAuthorization();
         // Furion 注入
         app.UseInject();
+        // 响应压缩
+        app.UseResponseCompression();
+
+        app.UseEndpoints(endpoints => endpoints.MapControllers());
         // 任务看板
         app.UseScheduleUI();
         // 日志看板
         app.UseLogDashboard();
-
-        app.UseEndpoints(endpoints => endpoints.MapControllers());
     }
 }
