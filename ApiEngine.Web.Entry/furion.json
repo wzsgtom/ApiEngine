@@ -55,11 +55,11 @@
     "DocExpansionState": "None",
     "GroupOpenApiInfos": [
       {
-        "Group": "Default",
         "Contact": {
           "Name": "查看日志（LogDashboard）",
           "Url": "/LogDashboard/Dashboard/BasicLog"
-        }
+        },
+        "Group": "Default"
       }
     ]
   }

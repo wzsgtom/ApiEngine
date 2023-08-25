@@ -8,7 +8,7 @@ public static class JsonExtension
     /// <returns></returns>
     public static string GetValueIgnoreCase(this JObject jobj, string key, string defaultvalue = "")
     {
-        return jobj.GetValue(key, StringComparison.CurrentCultureIgnoreCase).ToStringWithDefault(defaultvalue);
+        return jobj.GetValue(key, StringComparison.CurrentCultureIgnoreCase).ObjToString(defaultvalue);
     }
 
     /// <summary>

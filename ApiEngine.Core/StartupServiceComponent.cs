@@ -24,6 +24,8 @@ public sealed class StartupServiceComponent : IServiceComponent
         services.AddControllers().AddNewtonsoftJson(SetJsonOptions).AddInjectWithUnifyResult<ResultProvider>();
         // 响应压缩
         SetResponseCompression(services);
+        // 事件总线
+        SetEventBus(services);
         // 定时任务
         SetSchedule(services);
         // 任务队列
@@ -70,12 +72,12 @@ public sealed class StartupServiceComponent : IServiceComponent
                 var str = UtilMethods.GetSqlString(db.CurrentConnectionConfig.DbType, sql, pars);
                 str.LogInformation();
             };
+#endif
             db.Aop.OnError = ex =>
             {
                 var str = UtilMethods.GetSqlString(db.CurrentConnectionConfig.DbType, ex.Sql, (SugarParameter[])ex.Parametres);
                 str.LogError();
             };
-#endif
         });
 
         services.AddSingleton<ISqlSugarClient>(sugar);
@@ -104,6 +106,19 @@ public sealed class StartupServiceComponent : IServiceComponent
     }
 
     /// <summary>
+    ///     设置事件总线
+    /// </summary>
+    /// <param name="services"></param>
+    private static void SetEventBus(IServiceCollection services)
+    {
+        services.AddEventBus(options =>
+        {
+            options.LogEnabled = true;
+            options.UnobservedTaskExceptionHandler = EventHandles.OptionsUnobservedTaskExceptionHandler;
+        });
+    }
+
+    /// <summary>
     ///     设置后台任务
     /// </summary>
     private static void SetSchedule(IServiceCollection services)
@@ -126,7 +141,7 @@ public sealed class StartupServiceComponent : IServiceComponent
     /// </summary>
     private static void SetTaskQueue(IServiceCollection services)
     {
-        services.AddTaskQueue(options => options.UnobservedTaskExceptionHandler = EventHandles.OptionsUnobservedTaskExceptionHandler);
+        services.AddTaskQueue(options => { options.UnobservedTaskExceptionHandler = EventHandles.OptionsUnobservedTaskExceptionHandler; });
     }
 
     /// <summary>

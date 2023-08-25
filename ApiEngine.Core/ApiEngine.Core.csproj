@@ -24,13 +24,13 @@
 
     <ItemGroup>
         <PackageReference Include="AspNetCoreRateLimit" Version="5.0.0" />
-        <PackageReference Include="Furion.Extras.Authentication.JwtBearer" Version="4.8.8.40" />
-        <PackageReference Include="Furion.Extras.ObjectMapper.Mapster" Version="4.8.8.40" />
-        <PackageReference Include="Furion.Pure" Version="4.8.8.40" />
+        <PackageReference Include="Furion.Extras.Authentication.JwtBearer" Version="4.8.8.41" />
+        <PackageReference Include="Furion.Extras.ObjectMapper.Mapster" Version="4.8.8.41" />
+        <PackageReference Include="Furion.Pure" Version="4.8.8.41" />
         <PackageReference Include="LogDashboard" Version="1.4.8" />
         <PackageReference Include="NLog.Database" Version="5.2.3" />
         <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.3" />
-        <PackageReference Include="SqlSugarCoreNoDrive" Version="5.1.4.98" />
+        <PackageReference Include="SqlSugarCoreNoDrive" Version="5.1.4.102" />
     </ItemGroup>
 
     <ItemGroup>
