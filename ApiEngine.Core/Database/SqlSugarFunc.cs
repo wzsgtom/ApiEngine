@@ -3,11 +3,11 @@
 /// <summary>
 ///     通用数据库方法
 /// </summary>
-public class DbMethods : ITransient
+public class SqlSugarFunc : ITransient
 {
     private readonly ISqlSugarClient _dbScoped;
 
-    public DbMethods(ISqlSugarClient db)
+    public SqlSugarFunc(ISqlSugarClient db)
     {
         _dbScoped = db;
     }
@@ -16,10 +16,7 @@ public class DbMethods : ITransient
     ///     服务器时间
     /// </summary>
     /// <returns></returns>
-    public DateTime GetDate()
-    {
-        return _dbScoped.GetDate();
-    }
+    public DateTime GetDate() => _dbScoped.GetDate();
 
     /// <summary>
     ///     检查表是否存在，不存在则创建
@@ -56,10 +53,7 @@ public class DbMethods : ITransient
     /// <typeparam name="T"></typeparam>
     /// <param name="pkValue"></param>
     /// <returns></returns>
-    public async Task<T> QueryMod<T>(object pkValue) where T : class, new()
-    {
-        return await _dbScoped.Queryable<T>().InSingleAsync(pkValue);
-    }
+    public async Task<T> QueryMod<T>(object pkValue) where T : class, new() => await _dbScoped.Queryable<T>().InSingleAsync(pkValue);
 
     public async Task<List<T>> QueryList<T>(QueryMod<T> queryMod, PageMod pageMod = null, bool UnifyContextFill = true) where T : class, new()
     {
@@ -111,10 +105,7 @@ public class DbMethods : ITransient
     /// <typeparam name="T"></typeparam>
     /// <param name="mod"></param>
     /// <returns></returns>
-    public async Task<int> Insert<T>(T mod) where T : class, new()
-    {
-        return await _dbScoped.Insertable(mod).ExecuteCommandAsync();
-    }
+    public async Task<int> Insert<T>(T mod) where T : class, new() => await _dbScoped.Insertable(mod).ExecuteCommandAsync();
 
     /// <summary>
     ///     通用更新
@@ -122,10 +113,7 @@ public class DbMethods : ITransient
     /// <typeparam name="T"></typeparam>
     /// <param name="mod"></param>
     /// <returns></returns>
-    public async Task<int> Update<T>(T mod) where T : class, new()
-    {
-        return await _dbScoped.Updateable(mod).ExecuteCommandAsync();
-    }
+    public async Task<int> Update<T>(T mod) where T : class, new() => await _dbScoped.Updateable(mod).ExecuteCommandAsync();
 
     /// <summary>
     ///     通用删除（主键）
@@ -133,10 +121,7 @@ public class DbMethods : ITransient
     /// <typeparam name="T"></typeparam>
     /// <param name="pkValue"></param>
     /// <returns></returns>
-    public async Task<int> Delete<T>(object pkValue) where T : class, new()
-    {
-        return await _dbScoped.Deleteable<T>(pkValue).ExecuteCommandAsync();
-    }
+    public async Task<int> Delete<T>(object pkValue) where T : class, new() => await _dbScoped.Deleteable<T>(pkValue).ExecuteCommandAsync();
 
     /// <summary>
     ///     通用保存（判断主键，新增和更新）
@@ -188,9 +173,7 @@ public class QueryMod<T> where T : class
 /// </summary>
 public class PageMod
 {
-    public PageMod()
-    {
-    }
+    public PageMod() { }
 
     public PageMod(int pageNumber, int pageSize)
     {

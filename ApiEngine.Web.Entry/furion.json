@@ -22,7 +22,7 @@
     // 是否验证密钥，bool 类型，默认true
     "ValidateIssuerSigningKey": true,
     // 密钥，string 类型，必须是复杂密钥，长度大于16
-    "IssuerSigningKey": "YNbeHR7K8nV3fQGl",
+    "IssuerSigningKey": "2QRpxbO6WcdYJAutPNkGoq4jIfa10eCm",
     // 是否验证签发方，bool 类型，默认true
     "ValidateIssuer": true,
     // 签发方，string 类型
@@ -36,7 +36,9 @@
     // 过期时间，long 类型，单位分钟，默认20分钟
     "ExpiredTime": 60,
     // 过期时间容错值，long 类型，单位秒，默认 5秒
-    "ClockSkew": 5
+    "ClockSkew": 5,
+    // 加密算法，string 类型，默认 HS256
+    "Algorithm": "HS256"
   },
   "ValidationTypeMessageSettings": {
     "Definitions": [
@@ -47,7 +49,6 @@
     ]
   },
   "FriendlyExceptionSettings": {
-    "DefaultErrorMessage": "系统异常，请联系管理员",
     "LogError": false
   },
   "SpecificationDocumentSettings": {
@@ -56,7 +57,7 @@
     "GroupOpenApiInfos": [
       {
         "Contact": {
-          "Name": "查看日志（LogDashboard）",
+          "Name": "查看日志",
           "Url": "/LogDashboard/Dashboard/BasicLog"
         },
         "Group": "Default"

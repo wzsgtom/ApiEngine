@@ -12,6 +12,8 @@ public sealed class StartupServiceComponent : IServiceComponent
         SetRateLimit(services);
         // 健康检查
         services.AddHealthChecks();
+        // 设置缓存
+        SetCache(services);
         // 设置数据库
         SetSqlSugar(services);
         // 远程请求
@@ -58,30 +60,54 @@ public sealed class StartupServiceComponent : IServiceComponent
     }
 
     /// <summary>
+    ///     缓存注册（新生命Redis组件）
+    /// </summary>
+    public static void SetCache(IServiceCollection services)
+    {
+        var cache = NewLife.Caching.Cache.Default;
+        var cacheOptions = App.GetOptions<AppInfoOptions>().Cache;
+        if (cacheOptions.CacheType == CacheTypeEnum.Redis)
+        {
+            cache = new FullRedis(new RedisOptions
+            {
+                Configuration = cacheOptions.Redis.Configuration,
+                Prefix = cacheOptions.Redis.Prefix
+            });
+        }
+
+        services.AddSingleton(cache);
+    }
+
+    /// <summary>
     ///     设置数据库连接
     /// </summary>
     private static void SetSqlSugar(IServiceCollection services)
     {
-        var sugar = new SqlSugarScope(new List<ConnectionConfig>(App.GetConfig<List<ConnectionConfig>>("ConnectionConfigs")), db =>
+        var sqlSugar = new SqlSugarScope(new List<ConnectionConfig>(App.GetConfig<List<ConnectionConfig>>("ConnectionConfigs")), db =>
         {
-            db.CurrentConnectionConfig.IsAutoCloseConnection = true;
-            db.CurrentConnectionConfig.LanguageType = LanguageType.Chinese;
-#if DEBUG
-            db.Aop.OnLogExecuting = (sql, pars) =>
+            var config = db.CurrentConnectionConfig;
+            config.IsAutoCloseConnection = true;
+            config.LanguageType = LanguageType.Chinese;
+            config.ConfigureExternalServices = new ConfigureExternalServices
             {
-                var str = UtilMethods.GetSqlString(db.CurrentConnectionConfig.DbType, sql, pars);
-                str.LogInformation();
+                DataInfoCacheService = new SqlSugarCache()
             };
-#endif
+
+            db.Ado.CommandTimeOut = 60;
             db.Aop.OnError = ex =>
             {
-                var str = UtilMethods.GetSqlString(db.CurrentConnectionConfig.DbType, ex.Sql, (SugarParameter[])ex.Parametres);
-                str.LogError();
+                var sql = UtilMethods.GetSqlString(db.CurrentConnectionConfig.DbType, ex.Sql, (SugarParameter[])ex.Parametres);
+                sql.LogError(ex);
+#if DEBUG
+                var pars = db.Utilities.SerializeObject(((SugarParameter[])ex.Parametres).ToDictionary(it => it.ParameterName, it => it.Value));
+                App.PrintToMiniProfiler("SqlSugar", "Error", $"{ex.Message}{Environment.NewLine}{ex.Sql}{pars}{Environment.NewLine}");
+#endif
             };
         });
 
-        services.AddSingleton<ISqlSugarClient>(sugar);
-        services.AddScoped(typeof(Repository<>));
+        services.AddSingleton<ISqlSugarClient>(sqlSugar);
+        services.AddScoped(typeof(SqlSugarRepository<>));
+        services.AddUnitOfWork<SqlSugarUnitOfWork>();
     }
 
     /// <summary>
