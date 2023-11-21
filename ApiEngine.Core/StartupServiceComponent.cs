@@ -119,16 +119,16 @@ public sealed class StartupServiceComponent : IServiceComponent
         services.AddResponseCompression(options =>
         {
             // 可以添加多种压缩类型，程序会根据级别自动获取最优方式
-            options.Providers.Add<BrotliCompressionProvider>();
             options.Providers.Add<GzipCompressionProvider>();
+            options.Providers.Add<BrotliCompressionProvider>();
             // 针对指定的 MimeTypes 使用压缩策略
             options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/json" });
             options.EnableForHttps = true;
         });
 
         // 针对不同的压缩类型，设置对应的压缩级别
-        services.Configure<BrotliCompressionProviderOptions>(options => options.Level = CompressionLevel.Fastest);
         services.Configure<GzipCompressionProviderOptions>(options => options.Level = CompressionLevel.Fastest);
+        services.Configure<BrotliCompressionProviderOptions>(options => options.Level = CompressionLevel.Fastest);
     }
 
     /// <summary>
@@ -149,17 +149,13 @@ public sealed class StartupServiceComponent : IServiceComponent
     /// </summary>
     private static void SetSchedule(IServiceCollection services)
     {
-        var appInfo = App.GetOptions<AppInfoOptions>();
-        if (appInfo.Log.LogType == LogTypeEnum.Db)
+        services.AddSchedule(options =>
         {
-            services.AddSchedule(options =>
-            {
-                options.LogEnabled = true;
-                options.UnobservedTaskExceptionHandler = EventHandles.OptionsUnobservedTaskExceptionHandler;
+            options.LogEnabled = true;
+            options.UnobservedTaskExceptionHandler = EventHandles.OptionsUnobservedTaskExceptionHandler;
 
-                options.AddJob<LogJob>(nameof(LogJob), Triggers.Monthly().SetStartNow(true));
-            });
-        }
+            options.AddJob<LogJob>(nameof(LogJob), Triggers.Daily().SetStartNow(true));
+        });
     }
 
     /// <summary>
@@ -179,23 +175,29 @@ public sealed class StartupServiceComponent : IServiceComponent
         switch (appInfo.Log.LogType)
         {
             case LogTypeEnum.Db:
-                var dbLog = App.GetService<ISqlSugarClient>().AsTenant().GetConnection("log");
-                dbLog.DbMaintenance.CreateDatabase();
-                dbLog.CodeFirst.As<LogMod>(appInfo.Log.LogDbSet.TableName).InitTables<LogMod>();
-
-                LogManager.Setup().LoadConfigurationFromFile("nlog-db.config");
-                LogManager.Configuration.Variables["ConnectionString"] = dbLog.CurrentConnectionConfig.ConnectionString;
-                LogManager.Configuration.Variables["TableName"] = appInfo.Log.LogDbSet.TableName;
-
-                services.AddLogDashboard(opt =>
-                {
-                    opt.UseDataBase(() => new SqlConnection(dbLog.CurrentConnectionConfig.ConnectionString), appInfo.Log.LogDbSet.TableName);
-                    opt.CustomLogModel<RequestTraceLogModel>();
-                });
                 break;
             case LogTypeEnum.File:
             default:
-                LogManager.Setup().LoadConfigurationFromFile("nlog-file.config");
+                services.AddFileLogging(options =>
+                {
+                    options.FileNameRule = fileName => string.Format(fileName, AppContext.BaseDirectory, DateTime.Now);
+                    options.DateFormat = "yyyy-MM-dd HH:mm:ss.fff";
+                    options.WithTraceId = true;
+                    options.MessageFormat = logMsg =>
+                    {
+                        var sb = new StringBuilder();
+
+                        sb.AppendJoin("||",
+                            DateTime.Now.ToString(options.DateFormat),
+                            logMsg.LogLevel.ToString(),
+                            logMsg.LogName, logMsg.Message,
+                            logMsg.Exception,
+                            logMsg.TraceId,
+                            "end");
+
+                        return sb.ToString();
+                    };
+                });
                 services.AddLogDashboard(opt => opt.CustomLogModel<RequestTraceLogModel>());
                 break;
         }

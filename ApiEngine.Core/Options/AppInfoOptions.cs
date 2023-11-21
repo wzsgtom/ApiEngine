@@ -43,6 +43,11 @@ public class AppInfoOptions : IConfigurableOptions
         public LogTypeEnum LogType { get; set; } = LogTypeEnum.File;
 
         /// <summary>
+        ///     保留多少天
+        /// </summary>
+        public int RetainDays { get; set; } = 60;
+
+        /// <summary>
         ///     请求日志
         /// </summary>
         public bool Request { get; set; }
@@ -68,11 +73,6 @@ public class AppInfoOptions : IConfigurableOptions
             ///     表名
             /// </summary>
             public string TableName { get; set; }
-
-            /// <summary>
-            ///     保留几个月
-            /// </summary>
-            public int KeepMonths { get; set; } = 3;
         }
     }
 }

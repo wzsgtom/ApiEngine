@@ -1,37 +1,56 @@
 ﻿namespace ApiEngine.Core.Background;
 
-public class LogJob : IJob
+public class LogJob(IServiceScopeFactory scopeFactory, IOptions<AppInfoOptions> options) : IJob
 {
-    private readonly AppInfoOptions _options;
-    private readonly IServiceScopeFactory _scopeFactory;
+    private readonly AppInfoOptions _options = options.Value;
 
-    public LogJob(IServiceScopeFactory scopeFactory, IOptions<AppInfoOptions> options)
-    {
-        _scopeFactory = scopeFactory;
-        _options = options.Value;
-    }
-
-    /// <summary>
-    ///     清理数据库日志（仅数据库模式有用）
-    /// </summary>
-    /// <param name="context"></param>
-    /// <param name="stoppingToken"></param>
-    /// <returns></returns>
     public async Task ExecuteAsync(JobExecutingContext context, CancellationToken stoppingToken)
     {
-        if (_options.Log.LogType == LogTypeEnum.Db)
+        switch (_options.Log.LogType)
         {
-            using var scope = _scopeFactory.CreateScope();
-            var serviceProvider = scope.ServiceProvider;
+            case LogTypeEnum.Db:
+            {
+                using var scope = scopeFactory.CreateScope();
+                using var db = (scope.ServiceProvider.GetService<ISqlSugarClient>() as SqlSugarScope)?.AsTenant().GetConnection("log");
+                if (db != null)
+                {
+                    var keepDate = db.GetDate().AddDays(_options.Log.RetainDays * -1);
+                    await db.Deleteable<LogMod>().Where(w => w.LongDate < keepDate).ExecuteCommandAsync(stoppingToken);
+                }
 
-            using var db = (serviceProvider.GetService<ISqlSugarClient>() as SqlSugarScope)?.AsTenant().GetConnection("log");
-            if (db == null)
+                break;
+            }
+            case LogTypeEnum.File:
+            default:
+                DeleteFileLogs(Path.Combine(AppContext.BaseDirectory, "logs"), _options.Log.RetainDays);
+                break;
+        }
+    }
+
+    private static void DeleteFileLogs(string dir, int retainDays)
+    {
+        try
+        {
+            if (!Directory.Exists(dir))
             {
                 return;
             }
 
-            var keepDate = db.GetDate().AddMonths(_options.Log.LogDbSet.KeepMonths * -1);
-            await db.Deleteable<LogMod>().Where(w => w.LongDate < keepDate).ExecuteCommandAsync(stoppingToken);
+            var now = DateTime.Now;
+            foreach (var f in Directory.GetFileSystemEntries(dir).Where(File.Exists))
+            {
+                var t = File.GetCreationTime(f);
+                var elapsedTicks = now.Ticks - t.Ticks;
+                var elaspsedSpan = new TimeSpan(elapsedTicks);
+                if (elaspsedSpan.TotalDays > retainDays)
+                {
+                    File.Delete(f);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            ex.Message.LogError<LogJob>(ex);
         }
     }
 }
