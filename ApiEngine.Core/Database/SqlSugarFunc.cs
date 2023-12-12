@@ -3,20 +3,16 @@
 /// <summary>
 ///     通用数据库方法
 /// </summary>
-public class SqlSugarFunc : ITransient
+public class SqlSugarFunc(ISqlSugarClient db) : ITransient
 {
-    private readonly ISqlSugarClient _dbScoped;
-
-    public SqlSugarFunc(ISqlSugarClient db)
-    {
-        _dbScoped = db;
-    }
-
     /// <summary>
     ///     服务器时间
     /// </summary>
     /// <returns></returns>
-    public DateTime GetDate() => _dbScoped.GetDate();
+    public DateTime GetDate()
+    {
+        return db.GetDate();
+    }
 
     /// <summary>
     ///     检查表是否存在，不存在则创建
@@ -24,9 +20,9 @@ public class SqlSugarFunc : ITransient
     /// <param name="type"></param>
     public void CheckTable(Type type)
     {
-        if (!_dbScoped.DbMaintenance.IsAnyTable(_dbScoped.EntityMaintenance.GetTableName(type), false))
+        if (!db.DbMaintenance.IsAnyTable(db.EntityMaintenance.GetTableName(type), false))
         {
-            _dbScoped.CodeFirst.InitTables(type);
+            db.CodeFirst.InitTables(type);
         }
     }
 
@@ -38,12 +34,12 @@ public class SqlSugarFunc : ITransient
     public void CheckTable(IList<Type> types)
     {
         var listType = (from type in types
-            let tableName = _dbScoped.EntityMaintenance.GetTableName(type)
-            where !_dbScoped.DbMaintenance.IsAnyTable(tableName, false)
+            let tableName = db.EntityMaintenance.GetTableName(type)
+            where !db.DbMaintenance.IsAnyTable(tableName, false)
             select type).ToList();
         if (listType.Count > 0)
         {
-            _dbScoped.CodeFirst.InitTables(listType.ToArray());
+            db.CodeFirst.InitTables(listType.ToArray());
         }
     }
 
@@ -53,15 +49,18 @@ public class SqlSugarFunc : ITransient
     /// <typeparam name="T"></typeparam>
     /// <param name="pkValue"></param>
     /// <returns></returns>
-    public async Task<T> QueryMod<T>(object pkValue) where T : class, new() => await _dbScoped.Queryable<T>().InSingleAsync(pkValue);
+    public async Task<T> QueryMod<T>(object pkValue) where T : class, new()
+    {
+        return await db.Queryable<T>().InSingleAsync(pkValue);
+    }
 
     public async Task<List<T>> QueryList<T>(QueryMod<T> queryMod, PageMod pageMod = null, bool UnifyContextFill = true) where T : class, new()
     {
         var exp = GetExpressionable(queryMod);
 
         var iQueryable = queryMod.alias.IsNullOrEmpty()
-            ? _dbScoped.Queryable<T>().AS(queryMod.alias).Where(exp.ToExpression())
-            : _dbScoped.Queryable<T>().Where(exp.ToExpression());
+            ? db.Queryable<T>().AS(queryMod.alias).Where(exp.ToExpression())
+            : db.Queryable<T>().Where(exp.ToExpression());
 
         return await TryPage(iQueryable, pageMod, UnifyContextFill);
     }
@@ -105,7 +104,10 @@ public class SqlSugarFunc : ITransient
     /// <typeparam name="T"></typeparam>
     /// <param name="mod"></param>
     /// <returns></returns>
-    public async Task<int> Insert<T>(T mod) where T : class, new() => await _dbScoped.Insertable(mod).ExecuteCommandAsync();
+    public async Task<int> Insert<T>(T mod) where T : class, new()
+    {
+        return await db.Insertable(mod).ExecuteCommandAsync();
+    }
 
     /// <summary>
     ///     通用更新
@@ -113,7 +115,10 @@ public class SqlSugarFunc : ITransient
     /// <typeparam name="T"></typeparam>
     /// <param name="mod"></param>
     /// <returns></returns>
-    public async Task<int> Update<T>(T mod) where T : class, new() => await _dbScoped.Updateable(mod).ExecuteCommandAsync();
+    public async Task<int> Update<T>(T mod) where T : class, new()
+    {
+        return await db.Updateable(mod).ExecuteCommandAsync();
+    }
 
     /// <summary>
     ///     通用删除（主键）
@@ -121,7 +126,10 @@ public class SqlSugarFunc : ITransient
     /// <typeparam name="T"></typeparam>
     /// <param name="pkValue"></param>
     /// <returns></returns>
-    public async Task<int> Delete<T>(object pkValue) where T : class, new() => await _dbScoped.Deleteable<T>(pkValue).ExecuteCommandAsync();
+    public async Task<int> Delete<T>(object pkValue) where T : class, new()
+    {
+        return await db.Deleteable<T>(pkValue).ExecuteCommandAsync();
+    }
 
     /// <summary>
     ///     通用保存（判断主键，新增和更新）
@@ -131,7 +139,7 @@ public class SqlSugarFunc : ITransient
     /// <returns></returns>
     public async Task<int> Save<T>(T t) where T : class, new()
     {
-        var storage = await _dbScoped.Storageable(t).ToStorageAsync();
+        var storage = await db.Storageable(t).ToStorageAsync();
         if (storage.InsertList.Count > 0)
         {
             await storage.AsInsertable.ExecuteCommandAsync();

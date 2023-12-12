@@ -3,17 +3,12 @@
 /// <summary>
 ///     SqlSugar 事务和工作单元
 /// </summary>
-public sealed class SqlSugarUnitOfWork : IUnitOfWork
+public sealed class SqlSugarUnitOfWork(ISqlSugarClient sqlSugarClient) : IUnitOfWork
 {
     /// <summary>
     ///     SqlSugar 对象
     /// </summary>
-    private readonly ISqlSugarClient _sqlSugarClient;
-
-    public SqlSugarUnitOfWork(ISqlSugarClient sqlSugarClient)
-    {
-        _sqlSugarClient = sqlSugarClient;
-    }
+    private readonly ISqlSugarClient _sqlSugarClient = sqlSugarClient;
 
     /// <summary>
     ///     开启工作单元处理

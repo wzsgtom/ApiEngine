@@ -1,18 +1,13 @@
 ﻿namespace ApiEngine.Core.Aop;
 
-public class AuditFilter : ActionFilterAttribute
+public class AuditFilter(IOptionsMonitor<AppInfoOptions> options) : ActionFilterAttribute
 {
-    private readonly AppInfoOptions _options;
+    private readonly AppInfoOptions _options = options.CurrentValue;
 
-    public AuditFilter(IOptionsMonitor<AppInfoOptions> options)
-    {
-        _options = options.CurrentValue;
-    }
-    
     public override Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         var requestUrl = context.HttpContext.Request.GetRequestUrlAddress();
-        var allowLog = !_options.Log.IgnoreKeys.Exists(e => requestUrl.Contains(e));
+        var allowLog = !_options.Log.IgnoreKeys.Exists(requestUrl.Contains);
 
         if (context.ActionArguments.Count > 0 && _options.Log.Request && allowLog)
         {

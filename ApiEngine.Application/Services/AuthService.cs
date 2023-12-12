@@ -4,15 +4,8 @@
 ///     身份认证服务
 /// </summary>
 [AllowAnonymous]
-public class AuthService : IDynamicApiController, ITransient
+public class AuthService(IHttpContextAccessor accessor) : IDynamicApiController, ITransient
 {
-    private readonly IHttpContextAccessor _accessor;
-
-    public AuthService(IHttpContextAccessor accessor)
-    {
-        _accessor = accessor;
-    }
-
     /// <summary>
     ///     登录
     /// </summary>
@@ -33,11 +26,11 @@ public class AuthService : IDynamicApiController, ITransient
         var refreshToken = JWTEncryption.GenerateRefreshToken(accessToken, 480);
 
         // 设置Swagger自动登录
-        _accessor.HttpContext.SigninToSwagger(accessToken);
+        accessor.HttpContext.SigninToSwagger(accessToken);
 
         // 设置响应报文头
-        _accessor.HttpContext!.Response.Headers["access-token"] = accessToken;
-        _accessor.HttpContext!.Response.Headers["x-access-token"] = refreshToken;
+        accessor.HttpContext!.Response.Headers["access-token"] = accessToken;
+        accessor.HttpContext!.Response.Headers["x-access-token"] = refreshToken;
 
         return Task.CompletedTask;
     }

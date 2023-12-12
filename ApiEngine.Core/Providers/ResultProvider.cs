@@ -1,14 +1,9 @@
 ﻿namespace ApiEngine.Core.Providers;
 
 [UnifyModel(typeof(RESTfulResult<>))]
-public class ResultProvider : IUnifyResultProvider
+public class ResultProvider(IOptionsMonitor<AppInfoOptions> options) : IUnifyResultProvider
 {
-    private readonly AppInfoOptions _options;
-
-    public ResultProvider(IOptionsMonitor<AppInfoOptions> options)
-    {
-        _options = options.CurrentValue;
-    }
+    private readonly AppInfoOptions _options = options.CurrentValue;
 
     public IActionResult OnSucceeded(ActionExecutedContext context, object data)
     {
