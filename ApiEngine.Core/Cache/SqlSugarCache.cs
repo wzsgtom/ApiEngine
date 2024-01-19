@@ -20,11 +20,20 @@ public class SqlSugarCache : ICacheService
         _cache.Set(key, value, cacheDurationInSeconds);
     }
 
-    public bool ContainsKey<V>(string key) => _cache.ContainsKey(key);
+    public bool ContainsKey<V>(string key)
+    {
+        return _cache.ContainsKey(key);
+    }
 
-    public V Get<V>(string key) => _cache.Get<V>(key);
+    public V Get<V>(string key)
+    {
+        return _cache.Get<V>(key);
+    }
 
-    public IEnumerable<string> GetAllKey<V>() => _cache.Keys;
+    public IEnumerable<string> GetAllKey<V>()
+    {
+        return _cache.Keys;
+    }
 
     public V GetOrCreate<V>(string cacheKey, Func<V> create, int cacheDurationInSeconds = int.MaxValue)
     {

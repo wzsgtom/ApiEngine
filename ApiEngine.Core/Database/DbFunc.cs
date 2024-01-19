@@ -3,7 +3,7 @@
 /// <summary>
 ///     通用数据库方法
 /// </summary>
-public class SqlSugarFunc(ISqlSugarClient db) : ITransient
+public class DbFunc(ISqlSugarClient db) : ITransient
 {
     /// <summary>
     ///     服务器时间

@@ -4,9 +4,9 @@
 ///     仓储模式
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public class SqlSugarRepository<T> : SimpleClient<T> where T : class, new()
+public class DbRepository<T> : SimpleClient<T> where T : class, new()
 {
-    public SqlSugarRepository(ISqlSugarClient context = null) : base(context)
+    public DbRepository(ISqlSugarClient context = null) : base(context)
     {
         Context = context ?? App.GetService<ISqlSugarClient>();
     }

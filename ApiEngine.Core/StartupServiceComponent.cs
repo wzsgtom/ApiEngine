@@ -28,10 +28,10 @@ public sealed class StartupServiceComponent : IServiceComponent
         SetResponseCompression(services);
         // 事件总线
         SetEventBus(services);
-        // 定时任务
-        SetSchedule(services);
         // 任务队列
         SetTaskQueue(services);
+        // 定时任务
+        SetHangfire(services);
         // 日志
         SetLog(services);
     }
@@ -84,8 +84,8 @@ public sealed class StartupServiceComponent : IServiceComponent
     private static void SetSqlSugar(IServiceCollection services)
     {
         services.AddScoped<ISqlSugarClient>(sp => GetNew());
-        services.AddScoped(typeof(SqlSugarRepository<>));
-        services.AddUnitOfWork<SqlSugarUnitOfWork>();
+        services.AddScoped(typeof(DbRepository<>));
+        services.AddUnitOfWork<DbUnitOfWork>();
 
         return;
 
@@ -129,19 +129,20 @@ public sealed class StartupServiceComponent : IServiceComponent
     /// <param name="services"></param>
     private static void SetResponseCompression(IServiceCollection services)
     {
-        services.AddResponseCompression(options =>
+        services.AddResponseCompression(opt =>
         {
             // 可以添加多种压缩类型，程序会根据级别自动获取最优方式
-            options.Providers.Add<GzipCompressionProvider>();
-            options.Providers.Add<BrotliCompressionProvider>();
+            opt.Providers.Add<GzipCompressionProvider>();
+            opt.Providers.Add<BrotliCompressionProvider>();
             // 针对指定的 MimeTypes 使用压缩策略
-            options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/json" });
-            options.EnableForHttps = true;
+            opt.MimeTypes = ResponseCompressionDefaults.MimeTypes;
+            opt.ExcludedMimeTypes = ["text/html"];
+            opt.EnableForHttps = true;
         });
 
         // 针对不同的压缩类型，设置对应的压缩级别
-        services.Configure<GzipCompressionProviderOptions>(options => options.Level = CompressionLevel.Fastest);
-        services.Configure<BrotliCompressionProviderOptions>(options => options.Level = CompressionLevel.Fastest);
+        services.Configure<GzipCompressionProviderOptions>(opt => opt.Level = CompressionLevel.Fastest);
+        services.Configure<BrotliCompressionProviderOptions>(opt => opt.Level = CompressionLevel.Fastest);
     }
 
     /// <summary>
@@ -150,25 +151,21 @@ public sealed class StartupServiceComponent : IServiceComponent
     /// <param name="services"></param>
     private static void SetEventBus(IServiceCollection services)
     {
-        services.AddEventBus(options =>
+        services.AddEventBus(opt =>
         {
-            options.LogEnabled = true;
-            options.UnobservedTaskExceptionHandler = EventHandles.OptionsUnobservedTaskExceptionHandler;
+            opt.LogEnabled = true;
+            opt.UnobservedTaskExceptionHandler = EventHandles.OptionsUnobservedTaskExceptionHandler;
         });
     }
 
     /// <summary>
     ///     设置后台任务
     /// </summary>
-    private static void SetSchedule(IServiceCollection services)
+    private static void SetHangfire(IServiceCollection services)
     {
-        services.AddSchedule(options =>
-        {
-            options.LogEnabled = true;
-            options.UnobservedTaskExceptionHandler = EventHandles.OptionsUnobservedTaskExceptionHandler;
-
-            options.AddJob<LogJob>(nameof(LogJob), Triggers.Daily().SetStartNow(true));
-        });
+        services.AddHangfire(cfg => cfg.UseMemoryStorage());
+        services.AddHangfireServer();
+        GlobalJobFilters.Filters.Add(new AutomaticRetryAttribute { Attempts = 0 });
     }
 
     /// <summary>
@@ -176,7 +173,7 @@ public sealed class StartupServiceComponent : IServiceComponent
     /// </summary>
     private static void SetTaskQueue(IServiceCollection services)
     {
-        services.AddTaskQueue(options => { options.UnobservedTaskExceptionHandler = EventHandles.OptionsUnobservedTaskExceptionHandler; });
+        services.AddTaskQueue(opt => opt.UnobservedTaskExceptionHandler = EventHandles.OptionsUnobservedTaskExceptionHandler);
     }
 
     /// <summary>
@@ -184,36 +181,7 @@ public sealed class StartupServiceComponent : IServiceComponent
     /// </summary>
     private static void SetLog(IServiceCollection services)
     {
-        var appInfo = App.GetOptions<AppInfoOptions>();
-        switch (appInfo.Log.LogType)
-        {
-            case LogTypeEnum.Db:
-                break;
-            case LogTypeEnum.File:
-            default:
-                services.AddFileLogging(options =>
-                {
-                    options.FileNameRule = fileName => string.Format(fileName, AppContext.BaseDirectory, DateTime.Now);
-                    options.DateFormat = "yyyy-MM-dd HH:mm:ss.fff";
-                    options.WithTraceId = true;
-                    options.MessageFormat = logMsg =>
-                    {
-                        var sb = new StringBuilder();
-
-                        sb.AppendJoin("||",
-                            DateTime.Now.ToString(options.DateFormat),
-                            logMsg.LogLevel.ToString(),
-                            logMsg.LogName, logMsg.Message,
-                            logMsg.Exception,
-                            logMsg.TraceId,
-                            "end");
-
-                        return sb.ToString();
-                    };
-                });
-                services.AddLogDashboard(opt => opt.CustomLogModel<RequestTraceLogModel>());
-                break;
-        }
+        services.AddLogDashboard(opt => opt.CustomLogModel<RequestTraceLogModel>());
     }
 
     #endregion

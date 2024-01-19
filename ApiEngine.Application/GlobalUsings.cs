@@ -1,4 +1,5 @@
 global using ApiEngine.Application.Dtos;
+global using ApiEngine.Core.Constants;
 global using ApiEngine.Core.Extensions;
 global using ApiEngine.Core.Options;
 global using Furion.DataEncryption;

@@ -12,4 +12,6 @@ public class Const
     public const string DateTime14Format = "yyyy-MM-dd HH:mm:ss";
     public const string DateTime17 = "yyyyMMddHHmmssfff";
     public const string DateTime17Format = "yyyy-MM-dd HH:mm:ss.fff";
+
+    public const string RequiredPrompt = "{0}不能为空";
 }

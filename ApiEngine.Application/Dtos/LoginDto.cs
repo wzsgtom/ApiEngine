@@ -6,18 +6,21 @@ public class LoginDto
     ///     用户编码
     /// </summary>
     /// <example>000</example>
-    [Required(ErrorMessage = "用户编码不能为空")]
+    [Display(Name = "用户编码")]
+    [Required(ErrorMessage = Const.RequiredPrompt)]
     public string account { get; set; }
 
     /// <summary>
     ///     密码
     /// </summary>
     /// <example>1</example>
-    [Required(ErrorMessage = "密码不能为空")]
+    [Display(Name = "密码")]
+    [Required(ErrorMessage = Const.RequiredPrompt)]
     public string password { get; set; }
 
     /// <summary>
     ///     用户名称
     /// </summary>
+    [Display(Name = "用户名称")]
     public string name { get; set; }
 }

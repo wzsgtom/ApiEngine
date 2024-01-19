@@ -1,3 +1,3 @@
 using ApiEngine.Core;
 
-Serve.Run(RunOptions.Default.InjectCore().WithArgs(args));
+Serve.Run(Startup.InjectCore(RunOptions.Default).WithArgs(args));

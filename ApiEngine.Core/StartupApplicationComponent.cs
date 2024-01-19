@@ -13,6 +13,7 @@ public sealed class StartupApplicationComponent : IApplicationComponent
         app.UseCorsAccessor();
         // 限流
         app.UseIpRateLimiting();
+        app.UseClientRateLimiting();
         // 健康检查
         app.UseHealthChecks("/healthcheck");
         // 默认文件/静态文件
@@ -32,10 +33,29 @@ public sealed class StartupApplicationComponent : IApplicationComponent
         // 响应压缩
         app.UseResponseCompression();
 
-        app.UseEndpoints(endpoints => endpoints.MapControllers());
+        app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         // 任务看板
-        app.UseScheduleUI();
+        app.UseHangfireDashboard();
         // 日志看板
         app.UseLogDashboard();
+
+        RunWith();
+    }
+
+    private static void RunWith()
+    {
+        #region 日志清理
+
+        var appInfo = App.GetOptions<AppInfoOptions>();
+        if (appInfo.Log.LogType == LogTypeEnum.Db)
+        {
+            var logJob = App.GetService<ILogJob>();
+            logJob.RunJob();
+            RecurringJob.AddOrUpdate("日志清理", () => logJob.RunJob(),
+                Crontab.Monthly.ToString(),
+                new RecurringJobOptions { TimeZone = TimeZoneInfo.Local });
+        }
+
+        #endregion
     }
 }

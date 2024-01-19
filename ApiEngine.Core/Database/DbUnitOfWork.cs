@@ -3,7 +3,7 @@
 /// <summary>
 ///     SqlSugar 事务和工作单元
 /// </summary>
-public sealed class SqlSugarUnitOfWork(ISqlSugarClient sqlSugarClient) : IUnitOfWork
+public sealed class DbUnitOfWork(ISqlSugarClient sqlSugarClient) : IUnitOfWork
 {
     /// <summary>
     ///     SqlSugar 对象
