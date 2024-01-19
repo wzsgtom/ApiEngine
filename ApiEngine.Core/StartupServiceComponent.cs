@@ -83,31 +83,44 @@ public sealed class StartupServiceComponent : IServiceComponent
     /// </summary>
     private static void SetSqlSugar(IServiceCollection services)
     {
-        var sqlSugar = new SqlSugarScope(new List<ConnectionConfig>(App.GetConfig<List<ConnectionConfig>>("ConnectionConfigs")), db =>
-        {
-            var config = db.CurrentConnectionConfig;
-            config.IsAutoCloseConnection = true;
-            config.LanguageType = LanguageType.Chinese;
-            config.ConfigureExternalServices = new ConfigureExternalServices
-            {
-                DataInfoCacheService = new SqlSugarCache()
-            };
-
-            db.Ado.CommandTimeOut = 60;
-            db.Aop.OnError = ex =>
-            {
-                var sql = UtilMethods.GetSqlString(db.CurrentConnectionConfig.DbType, ex.Sql, (SugarParameter[])ex.Parametres);
-                sql.LogError(ex);
-#if DEBUG
-                var pars = db.Utilities.SerializeObject(((SugarParameter[])ex.Parametres).ToDictionary(it => it.ParameterName, it => it.Value));
-                App.PrintToMiniProfiler("SqlSugar", "Error", $"{ex.Message}{Environment.NewLine}{ex.Sql}{pars}{Environment.NewLine}");
-#endif
-            };
-        });
-
-        services.AddSingleton<ISqlSugarClient>(sqlSugar);
+        services.AddScoped<ISqlSugarClient>(sp => GetNew());
         services.AddScoped(typeof(SqlSugarRepository<>));
         services.AddUnitOfWork<SqlSugarUnitOfWork>();
+
+        return;
+
+        SqlSugarClient GetNew()
+        {
+            return new SqlSugarClient([.. App.GetConfig<List<ConnectionConfig>>("ConnectionConfigs")], db =>
+            {
+                var cfg = db.CurrentConnectionConfig;
+                cfg.IsAutoCloseConnection = true;
+                cfg.LanguageType = LanguageType.Chinese;
+                cfg.ConfigureExternalServices = new ConfigureExternalServices
+                {
+                    DataInfoCacheService = new SqlSugarCache()
+                };
+                cfg.MoreSettings = new ConnMoreSettings
+                {
+                    IsAutoRemoveDataCache = true,
+                    IsWithNoLockQuery = true
+                };
+
+                db.Ado.CommandTimeOut = 60;
+                db.Aop.OnError = ex =>
+                {
+                    var sqlLog = UtilMethods.GetSqlString(db.CurrentConnectionConfig.DbType, ex.Sql, (SugarParameter[])ex.Parametres);
+                    sqlLog.LogError(ex);
+                };
+#if DEBUG
+                db.Aop.OnLogExecuting = (sql, pars) =>
+                {
+                    var sqlLog = UtilMethods.GetSqlString(db.CurrentConnectionConfig.DbType, sql, pars);
+                    sqlLog.LogInformation();
+                };
+#endif
+            });
+        }
     }
 
     /// <summary>
