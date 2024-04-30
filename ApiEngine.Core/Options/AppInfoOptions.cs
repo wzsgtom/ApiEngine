@@ -60,19 +60,24 @@ public class AppInfoOptions : IConfigurableOptions
         /// <summary>
         ///     忽略关键字
         /// </summary>
-        public List<string> IgnoreKeys { get; set; } = new();
+        public List<string> IgnoreKeys { get; set; } = [];
 
         /// <summary>
-        ///     数据库日志
+        ///     Seq日志
         /// </summary>
-        public LogDbSetClass LogDbSet { get; set; }
+        public LogSeqSetClass LogSeqSet { get; set; }
 
-        public class LogDbSetClass
+        public class LogSeqSetClass
         {
             /// <summary>
-            ///     表名
+            ///     服务地址
             /// </summary>
-            public string TableName { get; set; }
+            public string ServerUrl { get; set; }
+
+            /// <summary>
+            ///     密钥
+            /// </summary>
+            public string ApiKey { get; set; }
         }
     }
 }
@@ -99,6 +104,6 @@ public enum LogTypeEnum
     [Description("文件")]
     File,
 
-    [Description("数据库")]
-    Db
+    [Description("Seq")]
+    Seq
 }

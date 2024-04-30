@@ -5,10 +5,7 @@
 /// </summary>
 public class SqlSugarCache : ICacheService
 {
-    /// <summary>
-    ///     内存缓存
-    /// </summary>
-    private static readonly ICache _cache = NewLife.Caching.Cache.Default;
+    private static readonly ICache _cache = App.GetService<ICache>() ?? NewLife.Caching.Cache.Default;
 
     public void Add<V>(string key, V value)
     {

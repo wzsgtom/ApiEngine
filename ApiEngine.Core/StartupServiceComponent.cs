@@ -83,44 +83,9 @@ public sealed class StartupServiceComponent : IServiceComponent
     /// </summary>
     private static void SetSqlSugar(IServiceCollection services)
     {
-        services.AddScoped<ISqlSugarClient>(sp => GetNew());
+        services.AddSingleton<ISqlSugarClient>(DbContext.GetNew());
         services.AddScoped(typeof(DbRepository<>));
         services.AddUnitOfWork<DbUnitOfWork>();
-
-        return;
-
-        SqlSugarClient GetNew()
-        {
-            return new SqlSugarClient([.. App.GetConfig<List<ConnectionConfig>>("ConnectionConfigs")], db =>
-            {
-                var cfg = db.CurrentConnectionConfig;
-                cfg.IsAutoCloseConnection = true;
-                cfg.LanguageType = LanguageType.Chinese;
-                cfg.ConfigureExternalServices = new ConfigureExternalServices
-                {
-                    DataInfoCacheService = new SqlSugarCache()
-                };
-                cfg.MoreSettings = new ConnMoreSettings
-                {
-                    IsAutoRemoveDataCache = true,
-                    IsWithNoLockQuery = true
-                };
-
-                db.Ado.CommandTimeOut = 60;
-                db.Aop.OnError = ex =>
-                {
-                    var sqlLog = UtilMethods.GetSqlString(db.CurrentConnectionConfig.DbType, ex.Sql, (SugarParameter[])ex.Parametres);
-                    sqlLog.LogError(ex);
-                };
-#if DEBUG
-                db.Aop.OnLogExecuting = (sql, pars) =>
-                {
-                    var sqlLog = UtilMethods.GetSqlString(db.CurrentConnectionConfig.DbType, sql, pars);
-                    sqlLog.LogInformation();
-                };
-#endif
-            });
-        }
     }
 
     /// <summary>

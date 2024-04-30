@@ -47,7 +47,7 @@ public sealed class StartupApplicationComponent : IApplicationComponent
         #region 日志清理
 
         var appInfo = App.GetOptions<AppInfoOptions>();
-        if (appInfo.Log.LogType == LogTypeEnum.Db)
+        if (appInfo.Log.LogType == LogTypeEnum.File)
         {
             var logJob = App.GetService<ILogJob>();
             logJob.RunJob();

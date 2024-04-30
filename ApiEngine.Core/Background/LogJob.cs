@@ -13,22 +13,12 @@ public class LogJob(IServiceScopeFactory scopeFactory, IOptions<AppInfoOptions> 
     {
         switch (_options.Log.LogType)
         {
-            case LogTypeEnum.Db:
-                await DeleteDbLogs(db.AsTenant().GetConnection("log"), _options.Log.RetainDays);
+            case LogTypeEnum.Seq:
                 break;
             case LogTypeEnum.File:
             default:
                 DeleteFileLogs(Path.Combine(AppContext.BaseDirectory, "logs"), _options.Log.RetainDays);
                 break;
-        }
-    }
-
-    private static async Task DeleteDbLogs(ISqlSugarClient dbLog, int retainDays)
-    {
-        if (dbLog != null)
-        {
-            var keepDate = dbLog.GetDate().AddDays(retainDays * -1);
-            await dbLog.Deleteable<LogMod>().Where(w => w.LongDate < keepDate).ExecuteCommandAsync();
         }
     }
 

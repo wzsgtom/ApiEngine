@@ -2,7 +2,6 @@
 global using ApiEngine.Core.Background;
 global using ApiEngine.Core.Cache;
 global using ApiEngine.Core.Database;
-global using ApiEngine.Core.Database.Models;
 global using ApiEngine.Core.Extensions;
 global using ApiEngine.Core.Handlers;
 global using ApiEngine.Core.Options;
