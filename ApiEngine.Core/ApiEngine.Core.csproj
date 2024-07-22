@@ -8,7 +8,7 @@
 		<GeneratePackageOnBuild>False</GeneratePackageOnBuild>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<ProduceReferenceAssembly>True</ProduceReferenceAssembly>
-		<Authors>xuezhiqiang</Authors>
+		<Authors>xavier</Authors>
 	</PropertyGroup>
 
 	<ItemGroup>

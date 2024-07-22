@@ -8,11 +8,11 @@
 		<GeneratePackageOnBuild>False</GeneratePackageOnBuild>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<ProduceReferenceAssembly>True</ProduceReferenceAssembly>
-		<Authors>xuezhiqiang</Authors>
+		<Authors>xavier</Authors>
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\ApiEngine.Core\ApiEngine.Core.csproj" />
+		<ProjectReference Include="..\ApiEngine.Core\ApiEngine.Core.csproj" />
 	</ItemGroup>
 
 </Project>

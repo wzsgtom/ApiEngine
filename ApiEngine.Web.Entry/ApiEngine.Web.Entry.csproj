@@ -9,16 +9,16 @@
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<ProduceReferenceAssembly>True</ProduceReferenceAssembly>
 		<InvariantGlobalization>False</InvariantGlobalization>
-		<Authors>xuezhiqiang</Authors>
+		<Authors>xavier</Authors>
 		<ApplicationIcon>favicon.ico</ApplicationIcon>
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Content Include="favicon.ico" />
+		<Content Include="favicon.ico" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\ApiEngine.Application\ApiEngine.Application.csproj" />
+		<ProjectReference Include="..\ApiEngine.Application\ApiEngine.Application.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
