@@ -5,11 +5,11 @@ public interface ILogJob : ITransient
     Task RunJob();
 }
 
-public class LogJob(IServiceScopeFactory scopeFactory, IOptions<AppInfoOptions> options, ISqlSugarClient db) : ILogJob
+public class LogJob(IOptions<AppInfoOptions> options) : ILogJob
 {
     private readonly AppInfoOptions _options = options.Value;
 
-    public async Task RunJob()
+    public Task RunJob()
     {
         switch (_options.Log.LogType)
         {
@@ -20,6 +20,8 @@ public class LogJob(IServiceScopeFactory scopeFactory, IOptions<AppInfoOptions> 
                 DeleteFileLogs(Path.Combine(AppContext.BaseDirectory, "logs"), _options.Log.RetainDays);
                 break;
         }
+
+        return Task.CompletedTask;
     }
 
     private static void DeleteFileLogs(string dir, int retainDays)

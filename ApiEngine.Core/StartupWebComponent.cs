@@ -11,7 +11,7 @@ public class StartupWebComponent : IWebComponent
             u.Limits.MaxRequestBodySize = null;
         });
 
-        builder.Host.UseSerilog((context, logger) =>
+        builder.Host.UseSerilog((_, logger) =>
         {
             logger.MinimumLevel.Information()
                 .Enrich.FromLogContext()

@@ -44,7 +44,10 @@ public sealed class StartupServiceComponent : IServiceComponent
     /// <param name="jsonOptions"></param>
     private static void SetJsonOptions(MvcNewtonsoftJsonOptions jsonOptions)
     {
-        jsonOptions.SerializerSettings.DateFormatString = "yyyy-MM-dd HH:mm:ss";
+        jsonOptions.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+        jsonOptions.SerializerSettings.Converters.AddLongTypeConverters();
+        jsonOptions.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local;
+        jsonOptions.SerializerSettings.DateFormatString = Const.Time17Format;
         jsonOptions.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
         jsonOptions.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
     }

@@ -8,7 +8,7 @@ public class LoginDto
     /// <example>000</example>
     [Display(Name = "用户编码")]
     [Required(ErrorMessage = Const.RequiredPrompt)]
-    public string account { get; set; }
+    public string Account { get; set; }
 
     /// <summary>
     ///     密码
@@ -16,11 +16,11 @@ public class LoginDto
     /// <example>1</example>
     [Display(Name = "密码")]
     [Required(ErrorMessage = Const.RequiredPrompt)]
-    public string password { get; set; }
+    public string Password { get; set; }
 
     /// <summary>
     ///     用户名称
     /// </summary>
     [Display(Name = "用户名称")]
-    public string name { get; set; }
+    public string Name { get; set; }
 }

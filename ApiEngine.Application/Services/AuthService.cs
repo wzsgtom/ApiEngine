@@ -18,8 +18,8 @@ public class AuthService(IHttpContextAccessor accessor) : IDynamicApiController,
         // 生成Token令牌
         var accessToken = JWTEncryption.Encrypt(new Dictionary<string, object>
         {
-            { "account", mod.account },
-            { "name", mod.name }
+            { "account", mod.Account },
+            { "name", mod.Name }
         });
 
         // 生成刷新Token令牌
