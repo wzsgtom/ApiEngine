@@ -88,11 +88,9 @@ public class AppInfoOptions : IConfigurableOptions
 [Description("缓存类型枚举")]
 public enum CacheTypeEnum
 {
-    [Description("内存缓存")]
-    Memory,
+    [Description("内存缓存")] Memory,
 
-    [Description("Redis缓存")]
-    Redis
+    [Description("Redis缓存")] Redis
 }
 
 /// <summary>
@@ -101,9 +99,7 @@ public enum CacheTypeEnum
 [Description("日志类型枚举")]
 public enum LogTypeEnum
 {
-    [Description("文件")]
-    File,
+    [Description("文件")] File,
 
-    [Description("Seq")]
-    Seq
+    [Description("Seq")] Seq
 }

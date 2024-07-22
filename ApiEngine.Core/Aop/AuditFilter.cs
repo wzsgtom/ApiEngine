@@ -10,9 +10,7 @@ public class AuditFilter(IOptionsMonitor<AppInfoOptions> options) : ActionFilter
         var allowLog = !_options.Log.IgnoreKeys.Exists(requestUrl.Contains);
 
         if (context.ActionArguments.Count > 0 && _options.Log.Request && allowLog)
-        {
             context.ActionArguments.ToJson().LogInformation<AuditFilter>();
-        }
 
         return base.OnActionExecutionAsync(context, next);
     }

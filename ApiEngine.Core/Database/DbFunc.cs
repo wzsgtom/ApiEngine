@@ -20,10 +20,7 @@ public class DbFunc(ISqlSugarClient db) : ITransient
     /// <param name="type"></param>
     public void CheckTable(Type type)
     {
-        if (!db.DbMaintenance.IsAnyTable(db.EntityMaintenance.GetTableName(type), false))
-        {
-            db.CodeFirst.InitTables(type);
-        }
+        if (!db.DbMaintenance.IsAnyTable(db.EntityMaintenance.GetTableName(type), false)) db.CodeFirst.InitTables(type);
     }
 
     /// <summary>
@@ -37,10 +34,7 @@ public class DbFunc(ISqlSugarClient db) : ITransient
             let tableName = db.EntityMaintenance.GetTableName(type)
             where !db.DbMaintenance.IsAnyTable(tableName, false)
             select type).ToList();
-        if (listType.Count > 0)
-        {
-            db.CodeFirst.InitTables(listType.ToArray());
-        }
+        if (listType.Count > 0) db.CodeFirst.InitTables(listType.ToArray());
     }
 
     /// <summary>
@@ -54,7 +48,8 @@ public class DbFunc(ISqlSugarClient db) : ITransient
         return await db.Queryable<T>().InSingleAsync(pkValue);
     }
 
-    public async Task<List<T>> QueryList<T>(QueryMod<T> queryMod, PageMod pageMod = null, bool UnifyContextFill = true) where T : class, new()
+    public async Task<List<T>> QueryList<T>(QueryMod<T> queryMod, PageMod pageMod = null, bool UnifyContextFill = true)
+        where T : class, new()
     {
         var exp = GetExpressionable(queryMod);
 
@@ -68,20 +63,15 @@ public class DbFunc(ISqlSugarClient db) : ITransient
     public Expressionable<T> GetExpressionable<T>(QueryMod<T> queryMod) where T : class, new()
     {
         var exp = new Expressionable<T>();
-        foreach (var (isAnd, expression) in queryMod.whereExpression)
-        {
-            exp.AndIF(isAnd, expression);
-        }
+        foreach (var (isAnd, expression) in queryMod.whereExpression) exp.AndIF(isAnd, expression);
 
         return exp;
     }
 
-    public async Task<List<T>> TryPage<T>(ISugarQueryable<T> iQueryable, PageMod pageMod = null, bool UnifyContextFill = true) where T : class, new()
+    public async Task<List<T>> TryPage<T>(ISugarQueryable<T> iQueryable, PageMod pageMod = null,
+        bool UnifyContextFill = true) where T : class, new()
     {
-        if (pageMod is not { pageNumber: > 0, pageSize: > 0 })
-        {
-            return await iQueryable.ToListAsync();
-        }
+        if (pageMod is not { pageNumber: > 0, pageSize: > 0 }) return await iQueryable.ToListAsync();
 
         RefAsync<int> totalNumber = 0;
         RefAsync<int> totalPage = 0;
@@ -90,10 +80,7 @@ public class DbFunc(ISqlSugarClient db) : ITransient
         pageMod.totalNumber = totalNumber.Value;
         pageMod.totalPage = totalPage.Value;
 
-        if (UnifyContextFill)
-        {
-            UnifyContext.Fill(new { page = pageMod });
-        }
+        if (UnifyContextFill) UnifyContext.Fill(new { page = pageMod });
 
         return pageList;
     }
@@ -140,15 +127,9 @@ public class DbFunc(ISqlSugarClient db) : ITransient
     public async Task<int> Save<T>(T t) where T : class, new()
     {
         var storage = await db.Storageable(t).ToStorageAsync();
-        if (storage.InsertList.Count > 0)
-        {
-            await storage.AsInsertable.ExecuteCommandAsync();
-        }
+        if (storage.InsertList.Count > 0) await storage.AsInsertable.ExecuteCommandAsync();
 
-        if (storage.UpdateList.Count > 0)
-        {
-            await storage.AsUpdateable.ExecuteCommandAsync();
-        }
+        if (storage.UpdateList.Count > 0) await storage.AsUpdateable.ExecuteCommandAsync();
 
         return storage.TotalList.Count;
     }
@@ -181,7 +162,9 @@ public class QueryMod<T> where T : class
 /// </summary>
 public class PageMod
 {
-    public PageMod() { }
+    public PageMod()
+    {
+    }
 
     public PageMod(int pageNumber, int pageSize)
     {

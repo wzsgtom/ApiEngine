@@ -1,4 +1,4 @@
-﻿namespace ApiEngine.Core.Background;
+﻿namespace ApiEngine.Core.Job;
 
 public interface ILogJob : ITransient
 {
@@ -26,10 +26,7 @@ public class LogJob(IServiceScopeFactory scopeFactory, IOptions<AppInfoOptions> 
     {
         try
         {
-            if (!Directory.Exists(dir))
-            {
-                return;
-            }
+            if (!Directory.Exists(dir)) return;
 
             var now = DateTime.Now;
             foreach (var f in Directory.GetFileSystemEntries(dir).Where(File.Exists))
@@ -37,10 +34,7 @@ public class LogJob(IServiceScopeFactory scopeFactory, IOptions<AppInfoOptions> 
                 var t = File.GetCreationTime(f);
                 var elapsedTicks = now.Ticks - t.Ticks;
                 var elaspsedSpan = new TimeSpan(elapsedTicks);
-                if (elaspsedSpan.TotalDays > retainDays)
-                {
-                    File.Delete(f);
-                }
+                if (elaspsedSpan.TotalDays > retainDays) File.Delete(f);
             }
         }
         catch (Exception ex)

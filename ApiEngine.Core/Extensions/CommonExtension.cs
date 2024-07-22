@@ -10,29 +10,17 @@ public static class CommonExtension
     /// <returns></returns>
     public static T ConvertType<T>(this string val)
     {
-        if (typeof(T) != typeof(bool))
-        {
-            return (T)Convert.ChangeType(val, typeof(T));
-        }
+        if (typeof(T) != typeof(bool)) return (T)Convert.ChangeType(val, typeof(T));
 
-        if (val.IsNullOrEmpty() || val.ToLower() == "false" || val == "0")
-        {
-            val = "False";
-        }
-        else
-        {
-            val = "True";
-        }
+        if (val.IsNullOrEmpty() || val.ToLower() == "false" || val == "0") val = "False";
+        else val = "True";
 
         return (T)Convert.ChangeType(val, typeof(T));
     }
 
     public static string ToBase64String(this string value)
     {
-        if (value.IsNullOrEmpty())
-        {
-            return "";
-        }
+        if (value.IsNullOrEmpty()) return "";
 
         var bytes = Encoding.UTF8.GetBytes(value);
         return Convert.ToBase64String(bytes);
@@ -40,10 +28,7 @@ public static class CommonExtension
 
     public static string UnBase64String(this string value)
     {
-        if (value.IsNullOrEmpty())
-        {
-            return "";
-        }
+        if (value.IsNullOrEmpty()) return "";
 
         var bytes = Convert.FromBase64String(value);
         return Encoding.UTF8.GetString(bytes);
@@ -62,10 +47,7 @@ public static class CommonExtension
         {
             var chars = item.ToCharArray();
             chars[0] = char.ToUpper(chars[0]);
-            for (var i = 1; i < chars.Length; i++)
-            {
-                chars[i] = char.ToLower(chars[i]);
-            }
+            for (var i = 1; i < chars.Length; i++) chars[i] = char.ToLower(chars[i]);
 
             newStr += new string(chars);
         }
@@ -103,10 +85,7 @@ public static class CommonExtension
     public static string Convert2DateString(this DateTime? date, string outFormat)
     {
         var outDate = DateTime.MinValue;
-        if (date != null)
-        {
-            outDate = (DateTime)date;
-        }
+        if (date != null) outDate = (DateTime)date;
 
         return outDate.ToString(outFormat);
     }

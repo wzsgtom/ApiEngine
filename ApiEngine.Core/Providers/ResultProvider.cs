@@ -12,9 +12,22 @@ public class ResultProvider(IOptionsMonitor<AppInfoOptions> options) : IUnifyRes
         return new JsonResult(result, UnifyContext.GetSerializerSettings(context));
     }
 
+    public IActionResult OnAuthorizeException(DefaultHttpContext context, ExceptionMetadata metadata)
+    {
+        var exception = metadata.Exception;
+        while (exception.InnerException != null) exception = exception.InnerException;
+
+        var result = NewResult(metadata.StatusCode, data: metadata.Data, errors: exception.Message);
+        if (exception is not AppFriendlyException and not SqlSugarException)
+            metadata.Exception.Message.LogError<ResultProvider>(metadata.Exception);
+
+        return new JsonResult(result, UnifyContext.GetSerializerSettings(context));
+    }
+
     public IActionResult OnValidateFailed(ActionExecutingContext context, ValidationMetadata metadata)
     {
-        var result = NewResult(metadata.StatusCode ?? StatusCodes.Status400BadRequest, data: metadata.Data, errors: metadata.FirstErrorMessage);
+        var result = NewResult(metadata.StatusCode ?? StatusCodes.Status400BadRequest, data: metadata.Data,
+            errors: metadata.FirstErrorMessage);
         Log(context, result);
         return new JsonResult(result, UnifyContext.GetSerializerSettings(context));
     }
@@ -22,22 +35,18 @@ public class ResultProvider(IOptionsMonitor<AppInfoOptions> options) : IUnifyRes
     public IActionResult OnException(ExceptionContext context, ExceptionMetadata metadata)
     {
         var exception = context.Exception;
-        while (exception.InnerException != null)
-        {
-            exception = exception.InnerException;
-        }
+        while (exception.InnerException != null) exception = exception.InnerException;
 
         var result = NewResult(metadata.StatusCode, data: metadata.Data, errors: exception.Message);
         if (exception is not AppFriendlyException && exception is not SqlSugarException)
-        {
             context.Exception.Message.LogError<ResultProvider>(context.Exception);
-        }
 
         Log(context, result);
         return new JsonResult(result, UnifyContext.GetSerializerSettings(context));
     }
 
-    public async Task OnResponseStatusCodes(HttpContext context, int statusCode, UnifyResultSettingsOptions unifyResultSettings = null)
+    public async Task OnResponseStatusCodes(HttpContext context, int statusCode,
+        UnifyResultSettingsOptions unifyResultSettings = null)
     {
         // 设置响应状态码
         UnifyContext.SetResponseStatusCodes(context, statusCode, unifyResultSettings);
@@ -62,22 +71,16 @@ public class ResultProvider(IOptionsMonitor<AppInfoOptions> options) : IUnifyRes
     private void Log(ActionContext context, RESTfulResult<object> result)
     {
         var requestUrl = context.HttpContext.Request.GetRequestUrlAddress();
-        var allowLog = !_options.Log.IgnoreKeys.Exists(e => requestUrl.Contains(e));
+        var allowLog = !_options.Log.IgnoreKeys.Exists(requestUrl.Contains);
 
-        if (allowLog)
-        {
-            if (result.Succeeded && _options.Log.Response)
-            {
-                result.ToJson().LogInformation<ResultProvider>();
-            }
-            else
-            {
-                result.ToJson().LogError<ResultProvider>();
-            }
-        }
+        if (!allowLog) return;
+
+        if (result.Succeeded && _options.Log.Response) result.ToJson().LogInformation<ResultProvider>();
+        else result.ToJson().LogError<ResultProvider>();
     }
 
-    private static RESTfulResult<object> NewResult(int statusCode, bool succeeded = default, object data = default, object errors = default)
+    private static RESTfulResult<object> NewResult(int statusCode, bool succeeded = default, object data = default,
+        object errors = default)
     {
         var result = new RESTfulResult<object>
         {
@@ -86,7 +89,7 @@ public class ResultProvider(IOptionsMonitor<AppInfoOptions> options) : IUnifyRes
             Succeeded = succeeded,
             Errors = errors,
             Extras = UnifyContext.Take(),
-            Timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
+            Timestamp = DateTimeOffset.Now.ToUnixTimeMilliseconds()
         };
 
         return result;

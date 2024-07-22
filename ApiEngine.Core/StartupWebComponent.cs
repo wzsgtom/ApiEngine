@@ -24,7 +24,8 @@ public class StartupWebComponent : IWebComponent
                     config.File(AppContext.BaseDirectory + "logs/.log",
                         rollingInterval: RollingInterval.Day,
                         retainedFileCountLimit: 60,
-                        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff}||{Level}||{SourceContext:l}||{Message}||{Exception}||{RequestId}||end{NewLine}");
+                        outputTemplate:
+                        "{Timestamp:yyyy-MM-dd HH:mm:ss.fff}||{Level}||{SourceContext:l}||{Message}||{Exception}||{RequestId}||end{NewLine}");
                 });
         });
     }

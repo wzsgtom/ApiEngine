@@ -5,46 +5,45 @@
 /// </summary>
 public class SqlSugarCache : ICacheService
 {
-    private static readonly ICache _cache = App.GetService<ICache>() ?? NewLife.Caching.Cache.Default;
+    private static readonly ICache Cache = App.GetService<ICache>() ?? NewLife.Caching.Cache.Default;
 
-    public void Add<V>(string key, V value)
+    public void Add<T>(string key, T value)
     {
-        _cache.Set(key, value);
+        Cache.Set(key, value);
     }
 
-    public void Add<V>(string key, V value, int cacheDurationInSeconds)
+    public void Add<T>(string key, T value, int cacheDurationInSeconds)
     {
-        _cache.Set(key, value, cacheDurationInSeconds);
+        Cache.Set(key, value, cacheDurationInSeconds);
     }
 
-    public bool ContainsKey<V>(string key)
+    public bool ContainsKey<T>(string key)
     {
-        return _cache.ContainsKey(key);
+        return Cache.ContainsKey(key);
     }
 
-    public V Get<V>(string key)
+    public T Get<T>(string key)
     {
-        return _cache.Get<V>(key);
+        return Cache.Get<T>(key);
     }
 
-    public IEnumerable<string> GetAllKey<V>()
+    public IEnumerable<string> GetAllKey<T>()
     {
-        return _cache.Keys;
+        return Cache.Keys;
     }
 
-    public V GetOrCreate<V>(string cacheKey, Func<V> create, int cacheDurationInSeconds = int.MaxValue)
+    public T GetOrCreate<T>(string cacheKey, Func<T> create, int cacheDurationInSeconds = int.MaxValue)
     {
-        if (!_cache.TryGetValue(cacheKey, out V value))
-        {
-            value = create();
-            _cache.Set(cacheKey, value, cacheDurationInSeconds);
-        }
+        if (Cache.TryGetValue(cacheKey, out T value)) return value;
+
+        value = create();
+        Cache.Set(cacheKey, value, cacheDurationInSeconds);
 
         return value;
     }
 
-    public void Remove<V>(string key)
+    public void Remove<T>(string key)
     {
-        _cache.Remove(key);
+        Cache.Remove(key);
     }
 }

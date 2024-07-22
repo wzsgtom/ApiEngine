@@ -1,5 +1,4 @@
 ﻿global using ApiEngine.Core.Aop;
-global using ApiEngine.Core.Background;
 global using ApiEngine.Core.Cache;
 global using ApiEngine.Core.Database;
 global using ApiEngine.Core.Extensions;

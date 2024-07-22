@@ -67,13 +67,11 @@ public sealed class StartupServiceComponent : IServiceComponent
         var cache = NewLife.Caching.Cache.Default;
         var cacheOptions = App.GetOptions<AppInfoOptions>().Cache;
         if (cacheOptions.CacheType == CacheTypeEnum.Redis)
-        {
             cache = new FullRedis(new RedisOptions
             {
                 Configuration = cacheOptions.Redis.Configuration,
                 Prefix = cacheOptions.Redis.Prefix
             });
-        }
 
         services.AddSingleton(cache);
     }
@@ -138,7 +136,8 @@ public sealed class StartupServiceComponent : IServiceComponent
     /// </summary>
     private static void SetTaskQueue(IServiceCollection services)
     {
-        services.AddTaskQueue(opt => opt.UnobservedTaskExceptionHandler = EventHandles.OptionsUnobservedTaskExceptionHandler);
+        services.AddTaskQueue(opt =>
+            opt.UnobservedTaskExceptionHandler = EventHandles.OptionsUnobservedTaskExceptionHandler);
     }
 
     /// <summary>

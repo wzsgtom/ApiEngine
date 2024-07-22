@@ -24,7 +24,8 @@ public class DbContext
             db.Ado.CommandTimeOut = 120;
             db.Aop.OnError = ex =>
             {
-                var sqlLog = UtilMethods.GetSqlString(db.CurrentConnectionConfig.DbType, ex.Sql, (SugarParameter[])ex.Parametres);
+                var sqlLog = UtilMethods.GetSqlString(db.CurrentConnectionConfig.DbType, ex.Sql,
+                    (SugarParameter[])ex.Parametres);
                 sqlLog.LogError(ex);
             };
 #if DEBUG

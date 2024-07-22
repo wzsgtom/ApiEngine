@@ -6,8 +6,9 @@ public class JwtHandler : AppAuthorizeHandler
     ///     重写 Handler 添加自动刷新收取逻辑
     /// </summary>
     /// <param name="context"></param>
+    /// <param name="httpContext"></param>
     /// <returns></returns>
-    public override async Task HandleAsync(AuthorizationHandlerContext context)
+    public override async Task HandleAsync(AuthorizationHandlerContext context, DefaultHttpContext httpContext)
     {
         if (JWTEncryption.AutoRefreshToken(context, context.GetCurrentHttpContext(), refreshTokenExpiredTime: 480))
         {

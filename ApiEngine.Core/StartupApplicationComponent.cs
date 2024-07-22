@@ -1,13 +1,12 @@
-﻿namespace ApiEngine.Core;
+﻿using ApiEngine.Core.Job;
+
+namespace ApiEngine.Core;
 
 public sealed class StartupApplicationComponent : IApplicationComponent
 {
     public void Load(IApplicationBuilder app, IWebHostEnvironment env, ComponentContext componentContext)
     {
-        if (env.IsDevelopment())
-        {
-            app.UseDeveloperExceptionPage();
-        }
+        if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
 
         // 跨域
         app.UseCorsAccessor();

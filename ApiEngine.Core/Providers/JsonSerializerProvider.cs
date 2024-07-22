@@ -10,7 +10,8 @@ public class JsonSerializerProvider : IJsonSerializerProvider, ISingleton
     /// <returns></returns>
     public string Serialize(object value, object jsonSerializerOptions = null)
     {
-        return JsonConvert.SerializeObject(value, (jsonSerializerOptions ?? GetSerializerOptions()) as JsonSerializerSettings);
+        return JsonConvert.SerializeObject(value,
+            (jsonSerializerOptions ?? GetSerializerOptions()) as JsonSerializerSettings);
     }
 
     /// <summary>
@@ -22,7 +23,8 @@ public class JsonSerializerProvider : IJsonSerializerProvider, ISingleton
     /// <returns></returns>
     public T Deserialize<T>(string json, object jsonSerializerOptions = null)
     {
-        return JsonConvert.DeserializeObject<T>(json, (jsonSerializerOptions ?? GetSerializerOptions()) as JsonSerializerSettings);
+        return JsonConvert.DeserializeObject<T>(json,
+            (jsonSerializerOptions ?? GetSerializerOptions()) as JsonSerializerSettings);
     }
 
     /// <summary>
@@ -34,7 +36,8 @@ public class JsonSerializerProvider : IJsonSerializerProvider, ISingleton
     /// <returns></returns>
     public object Deserialize(string json, Type returnType, object jsonSerializerOptions = null)
     {
-        return JsonConvert.DeserializeObject(json, returnType, (jsonSerializerOptions ?? GetSerializerOptions()) as JsonSerializerSettings);
+        return JsonConvert.DeserializeObject(json, returnType,
+            (jsonSerializerOptions ?? GetSerializerOptions()) as JsonSerializerSettings);
     }
 
     /// <summary>

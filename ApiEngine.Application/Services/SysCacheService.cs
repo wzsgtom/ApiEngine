@@ -14,7 +14,8 @@ public class SysCacheService(ICache cache, IOptions<AppInfoOptions> appOptions) 
     public IEnumerable<string> GetKeys()
     {
         // 键名去掉全局缓存前缀
-        return cache.Keys.Where(u => u.StartsWith(_cacheOptions.Prefix)).Select(u => u[_cacheOptions.Prefix.Length..]).OrderBy(u => u);
+        return cache.Keys.Where(u => u.StartsWith(_cacheOptions.Prefix)).Select(u => u[_cacheOptions.Prefix.Length..])
+            .OrderBy(u => u);
     }
 
     /// <summary>
