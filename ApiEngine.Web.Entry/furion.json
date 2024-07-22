@@ -1,15 +1,10 @@
 ﻿{
-  "$schema": "https://gitee.com/dotnetchina/Furion/raw/net6/schemas/v3/furion-schema.json",
+  "$schema": "https://gitee.com/dotnetchina/Furion/raw/v4/schemas/v4/furion-schema.json",
   "AppSettings": {
-    "InjectSpecificationDocument": true,
-    "InjectMiniProfiler": true
-  },
-  "DynamicApiControllerSettings": {
-    // 默认路由前缀，string，默认 api
-    "DefaultRoutePrefix": "api",
-    "KeepVerb": true,
-    // 路由参数采用 [FromQuery] 化，默认 false（[FromRoute] 方式）
-    "UrlParameterization": true
+    "EnabledReferenceAssemblyScan": true,
+    "ExternalAssemblies": [ "plugins" ],
+    "InjectMiniProfiler": true,
+    "InjectSpecificationDocument": true
   },
   "CorsAccessorSettings": {
     "WithExposedHeaders": [
@@ -18,27 +13,54 @@
       "environment"
     ]
   },
+  "DynamicApiControllerSettings": {
+    "DefaultRoutePrefix": "api",
+    "KeepVerb": true,
+    "UrlParameterization": true,
+    "VerbToHttpMethods": [
+      [ "Update", "POST" ]
+    ]
+  },
+  "FriendlyExceptionSettings": {
+    "LogError": false
+  },
   "JWTSettings": {
-    // 是否验证密钥，bool 类型，默认true
-    "ValidateIssuerSigningKey": true,
-    // 密钥，string 类型，必须是复杂密钥，长度大于16
-    "IssuerSigningKey": "2QRpxbO6WcdYJAutPNkGoq4jIfa10eCm",
-    // 是否验证签发方，bool 类型，默认true
-    "ValidateIssuer": true,
-    // 签发方，string 类型
-    "ValidIssuer": "xhsoft.api",
-    // 是否验证签收方，bool 类型，默认true
-    "ValidateAudience": true,
-    // 签收方，string 类型
-    "ValidAudience": "xhsoft.app",
-    // 是否验证过期时间，bool 类型，默认true，建议true
-    "ValidateLifetime": true,
-    // 过期时间，long 类型，单位分钟，默认20分钟
-    "ExpiredTime": 60,
+    // 加密算法，string 类型，默认 HS256
+    "Algorithm": "HS256",
     // 过期时间容错值，long 类型，单位秒，默认 5秒
     "ClockSkew": 5,
-    // 加密算法，string 类型，默认 HS256
-    "Algorithm": "HS256"
+    // 过期时间，long 类型，单位分钟，默认20分钟
+    "ExpiredTime": 60,
+    // 密钥，string 类型，必须是复杂密钥，长度大于16
+    "IssuerSigningKey": "QWHdnKcxfVOj3EqGgkiCANFRsLv2l5Ut",
+    // 是否验证签收方，bool 类型，默认true
+    "ValidateAudience": true,
+    // 是否验证签发方，bool 类型，默认true
+    "ValidateIssuer": true,
+    // 是否验证密钥，bool 类型，默认true
+    "ValidateIssuerSigningKey": true,
+    // 是否验证过期时间，bool 类型，默认true，建议true
+    "ValidateLifetime": true,
+    // 签收方，string 类型
+    "ValidAudience": "xhsoft.app",
+    // 签发方，string 类型
+    "ValidIssuer": "xhsoft.api"
+  },
+  "SpecificationDocumentSettings": {
+    "DefaultGroupName": "Default",
+    "DocExpansionState": "None",
+    "DocumentTitle": "综合服务平台-API文档",
+    "GroupOpenApiInfos": [
+      {
+        "Contact": {
+          "Name": "查看日志",
+          //"Url": "/LogDashboard/Dashboard/BasicLog"
+          "Url": "http://192.168.1.100:5341"
+        },
+        "Group": "Default",
+        "Order": 1
+      }
+    ]
   },
   "ValidationTypeMessageSettings": {
     "Definitions": [
@@ -46,22 +68,6 @@
         "Required",
         "值不能为空或Null"
       ]
-    ]
-  },
-  "FriendlyExceptionSettings": {
-    "LogError": false
-  },
-  "SpecificationDocumentSettings": {
-    "DocumentTitle": "API文档",
-    "DocExpansionState": "None",
-    "GroupOpenApiInfos": [
-      {
-        "Contact": {
-          "Name": "查看日志",
-          "Url": "/LogDashboard/Dashboard/BasicLog"
-        },
-        "Group": "Default"
-      }
     ]
   }
 }

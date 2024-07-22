@@ -16,10 +16,7 @@
     //端点白名单
     "EndpointWhitelist": [],
     //客户端白名单
-    "ClientWhitelist": [
-      "000",
-      "admin"
-    ],
+    "ClientWhitelist": [],
     "QuotaExceededResponse": {
       "Content": "{{\"statusCode\":429,\"succeeded\":false,\"errors\":\"访问过于频繁，请稍后重试\"}}",
       "ContentType": "application/json",
@@ -27,22 +24,22 @@
     },
     //返回状态码
     "HttpStatusCode": 429,
-    //api规则,结尾一定要带*
+    //api规则，结尾一定要带*
     "GeneralRules": [
-      {
-        //端点路径
-        "Endpoint": "*",
-        //时间段，格式：{数字}{单位}；可使用单位：s, m, h, d
-        "Period": "1s",
-        //限制
-        "Limit": 3
-      },
-      //1分钟只能调用200次
-      {
-        "Endpoint": "*",
-        "Period": "1m",
-        "Limit": 200
-      }
+      //{
+      //  //端点路径
+      //  "Endpoint": "*",
+      //  //时间段，格式：{数字}{单位}；可使用单位：s, m, h, d
+      //  "Period": "1s",
+      //  //限制
+      //  "Limit": 10
+      //},
+      ////1分钟只能调用200次
+      //{
+      //  "Endpoint": "*",
+      //  "Period": "1m",
+      //  "Limit": 200
+      //}
     ]
   }
 }

@@ -1,11 +1,16 @@
-﻿namespace ApiEngine.Application.EventBus;
+﻿using Furion.DependencyInjection;
+using Furion.EventBus;
+using Furion.JsonSerialization;
+using Furion.Logging.Extensions;
 
-public class BaseEventSubscriber : IEventSubscriber, ISingleton
+namespace ApiEngine.Application.EventBus;
+
+public class BaseEventSubscriber(IJsonSerializerProvider jsonSerializer) : IEventSubscriber, ISingleton
 {
     [EventSubscribe("Base:Test")]
     public async Task Test(EventHandlerExecutingContext context)
     {
         await Task.Delay(3000);
-        context.Source.ToJson().LogInformation();
+        jsonSerializer.Serialize(context.Source).LogInformation();
     }
 }
