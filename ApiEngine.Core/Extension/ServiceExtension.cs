@@ -1,5 +1,4 @@
-﻿using ApiEngine.Core.Database;
-using ApiEngine.Core.Database.SqlSugar;
+﻿using ApiEngine.Core.Database.SqlSugar;
 using ApiEngine.Core.Handler;
 using ApiEngine.Core.Option;
 using AspNetCoreRateLimit;
@@ -63,8 +62,6 @@ public static class ServiceExtension
     internal static void SetSqlSugar(this IServiceCollection services)
     {
         var db = DbContext.GetNew();
-        DbInfo.SetDbVersion(db);
-
         services.AddSingleton<ISqlSugarClient>(db);
         services.AddScoped(typeof(DbRepository<>));
     }

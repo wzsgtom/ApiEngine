@@ -6,11 +6,14 @@ namespace ApiEngine.Core.Database.SqlSugar;
 
 public class DbContext
 {
+    public static readonly IReadOnlyList<OwnConnectionConfig> ConnectionConfigs =
+        App.GetConfig<List<OwnConnectionConfig>>("ConnectionConfigs");
+
     public static readonly ICacheService CacheService = new DbCache();
 
     public static SqlSugarScope GetNew()
     {
-        return new SqlSugarScope([.. App.GetConfig<List<ConnectionConfig>>("ConnectionConfigs")], db =>
+        return new SqlSugarScope([.. ConnectionConfigs], db =>
         {
             db.CurrentConnectionConfig.IsAutoCloseConnection = true;
             db.CurrentConnectionConfig.LanguageType = LanguageType.Chinese;
@@ -35,7 +38,7 @@ public class DbContext
             db.Aop.OnLogExecuting = (s, p) =>
             {
                 var sqlLog = UtilMethods.GetNativeSql(s, p);
-                sqlLog.LogInformation();
+                sqlLog.LogDebug();
             };
 #endif
         });

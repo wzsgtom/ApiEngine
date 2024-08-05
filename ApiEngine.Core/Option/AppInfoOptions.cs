@@ -42,11 +42,6 @@ public class AppInfoOptions : IConfigurableOptions
     public class LogOptions
     {
         /// <summary>
-        ///     日志类型
-        /// </summary>
-        public LogTypeEnum LogType { get; set; } = LogTypeEnum.File;
-
-        /// <summary>
         ///     请求日志
         /// </summary>
         public bool Request { get; set; }
@@ -60,24 +55,6 @@ public class AppInfoOptions : IConfigurableOptions
         ///     忽略关键字
         /// </summary>
         public List<string> IgnoreKeys { get; set; } = [];
-
-        /// <summary>
-        ///     Seq日志
-        /// </summary>
-        public LogSeqSetClass LogSeqSet { get; set; }
-
-        public class LogSeqSetClass
-        {
-            /// <summary>
-            ///     服务地址
-            /// </summary>
-            public string ServerUrl { get; set; }
-
-            /// <summary>
-            ///     密钥
-            /// </summary>
-            public string ApiKey { get; set; }
-        }
     }
 }
 
@@ -90,15 +67,4 @@ public enum CacheTypeEnum
     [Description("内存缓存")] Memory,
 
     [Description("Redis缓存")] Redis
-}
-
-/// <summary>
-///     日志类型
-/// </summary>
-[Description("日志类型枚举")]
-public enum LogTypeEnum
-{
-    [Description("文件")] File,
-
-    [Description("Seq")] Seq
 }

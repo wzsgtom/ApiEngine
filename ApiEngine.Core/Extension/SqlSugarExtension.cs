@@ -1,5 +1,6 @@
-﻿using ApiEngine.Core.Database;
+﻿using ApiEngine.Core.Database.SqlSugar;
 using SqlSugar;
+using SqlSugar.Extensions;
 
 namespace ApiEngine.Core.Extension;
 
@@ -50,14 +51,14 @@ public static class SqlSugarExtension
     }
 
     /// <summary>
-    ///     8小时
+    ///     获取配置
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="queryable"></param>
+    /// <param name="db"></param>
     /// <returns></returns>
-    public static ISugarQueryable<T> WithCache28800<T>(this ISugarQueryable<T> queryable) where T : class, new()
+    public static OwnConnectionConfig GetDbConfig(this ISqlSugarClient db)
     {
-        return queryable.WithCache(28800);
+        var config = DbContext.ConnectionConfigs.First(f => f.ConfigId == db.CurrentConnectionConfig.ConfigId);
+        return config;
     }
 
     /// <summary>
@@ -73,9 +74,11 @@ public static class SqlSugarExtension
     public static List<T> VersionToPageList<T>(this ISugarQueryable<T> queryable, int pageNumber, int pageSize,
         ref int totalNumber, ref int totalPage) where T : class, new()
     {
-        return DbInfo.YearVersionInt < 2012
-            ? queryable.ToPageList(pageNumber, pageSize, ref totalNumber, ref totalPage)
-            : queryable.ToOffsetPage(pageNumber, pageSize, ref totalNumber, ref totalPage);
+        var dbConfig = queryable.Context.GetDbConfig();
+        if (dbConfig.DbType == DbType.SqlServer && dbConfig.Version.ObjToInt() > 2008)
+            return queryable.ToOffsetPage(pageNumber, pageSize, ref totalNumber, ref totalPage);
+
+        return queryable.ToPageList(pageNumber, pageSize, ref totalNumber, ref totalPage);
     }
 
     /// <summary>
@@ -91,8 +94,10 @@ public static class SqlSugarExtension
     public static async Task<List<T>> VersionToPageListAsync<T>(this ISugarQueryable<T> queryable, int pageNumber,
         int pageSize, RefAsync<int> totalNumber, RefAsync<int> totalPage) where T : class, new()
     {
-        return DbInfo.YearVersionInt < 2012
-            ? await queryable.ToPageListAsync(pageNumber, pageSize, totalNumber, totalPage)
-            : await queryable.ToOffsetPageAsync(pageNumber, pageSize, totalNumber, totalPage);
+        var dbConfig = queryable.Context.GetDbConfig();
+        if (dbConfig.DbType == DbType.SqlServer && dbConfig.Version.ObjToInt() > 2008)
+            return await queryable.ToOffsetPageAsync(pageNumber, pageSize, totalNumber, totalPage);
+
+        return await queryable.ToPageListAsync(pageNumber, pageSize, totalNumber, totalPage);
     }
 }

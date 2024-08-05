@@ -13,14 +13,13 @@
 
 	<ItemGroup>
 		<PackageReference Include="AspNetCoreRateLimit" Version="5.0.0" />
-		<PackageReference Include="Furion.Extras.Authentication.JwtBearer" Version="4.9.4.7" />
-		<PackageReference Include="Furion.Extras.ObjectMapper.Mapster" Version="4.9.4.7" />
-		<PackageReference Include="Furion.Pure" Version="4.9.4.7" />
+		<PackageReference Include="Furion.Extras.Authentication.JwtBearer" Version="4.9.4.11" />
+		<PackageReference Include="Furion.Extras.ObjectMapper.Mapster" Version="4.9.4.11" />
+		<PackageReference Include="Furion.Pure" Version="4.9.4.11" />
 		<PackageReference Include="Hangfire.AspNetCore" Version="1.8.14" />
 		<PackageReference Include="Hangfire.Storage.SQLite" Version="0.4.2" />
-		<PackageReference Include="NewLife.Redis" Version="5.7.2024.709" />
-		<PackageReference Include="Serilog.AspNetCore" Version="8.0.1" />
-		<PackageReference Include="Serilog.Sinks.Async" Version="2.0.0" />
+		<PackageReference Include="NewLife.Redis" Version="5.7.2024.801" />
+		<PackageReference Include="Serilog.AspNetCore" Version="8.0.2" />
 		<PackageReference Include="Serilog.Sinks.Seq" Version="8.0.0" />
 		<PackageReference Include="ServiceSelf" Version="1.0.7" />
 		<PackageReference Include="SqlSugarCoreNoDrive" Version="5.1.4.166" />

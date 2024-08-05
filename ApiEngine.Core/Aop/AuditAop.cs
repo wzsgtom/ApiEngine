@@ -1,14 +1,13 @@
-﻿using ApiEngine.Core.Option;
-using Furion.JsonSerialization;
-using Furion.Logging.Extensions;
+﻿using ApiEngine.Core.Extension;
+using ApiEngine.Core.Option;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace ApiEngine.Core.Aop;
 
-public class AuditFilter(IOptionsMonitor<AppInfoOptions> options, IJsonSerializerProvider jsonSerializer)
-    : ActionFilterAttribute
+public class AuditAop(ILogger<AuditAop> logger, IOptionsMonitor<AppInfoOptions> options) : ActionFilterAttribute
 {
     public override Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
@@ -16,7 +15,7 @@ public class AuditFilter(IOptionsMonitor<AppInfoOptions> options, IJsonSerialize
         var allowLog = !options.CurrentValue.Log.IgnoreKeys.Exists(requestUrl.Contains);
 
         if (context.ActionArguments.Count > 0 && options.CurrentValue.Log.Request && allowLog)
-            jsonSerializer.Serialize(context.ActionArguments).LogInformation<AuditFilter>();
+            logger.LogInformation("{0}", context.ActionArguments.ToJson());
 
         return base.OnActionExecutionAsync(context, next);
     }

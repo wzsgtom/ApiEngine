@@ -76,9 +76,6 @@ public class BaseService(ISqlSugarClient db, DbFunc dbFunc) : IDynamicApiControl
             case CacheEnum.S7200:
                 queryable.WithCache7200();
                 break;
-            case CacheEnum.S28800:
-                queryable.WithCache28800();
-                break;
             case CacheEnum.None:
                 break;
             default:

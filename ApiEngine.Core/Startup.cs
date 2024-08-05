@@ -39,7 +39,7 @@ public class Startup : AppStartup
         // JWT授权
         services.AddJwt<JwtHandler>(enableGlobalAuthorize: App.GetOptions<AppInfoOptions>().GlobalAuthorize);
         // 审计
-        services.AddMvcFilter<AuditFilter>();
+        services.AddMvcFilter<AuditAop>();
         // 控制器.设置JSON.规范化结果
         services.AddControllers().AddNewtonsoftJson(jsonOptions =>
         {
