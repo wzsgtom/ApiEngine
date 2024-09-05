@@ -1,6 +1,5 @@
 ﻿using Furion.ConfigurableOptions;
 using NewLife.Caching;
-using System.ComponentModel;
 
 namespace ApiEngine.Core.Option;
 
@@ -24,16 +23,6 @@ public class AppInfoOptions : IConfigurableOptions
     public class CacheOptions
     {
         /// <summary>
-        ///     缓存前缀
-        /// </summary>
-        public string Prefix { get; set; }
-
-        /// <summary>
-        ///     缓存类型
-        /// </summary>
-        public CacheTypeEnum CacheType { get; set; } = CacheTypeEnum.Memory;
-
-        /// <summary>
         ///     Redis缓存选项
         /// </summary>
         public RedisOptions Redis { get; set; }
@@ -56,15 +45,4 @@ public class AppInfoOptions : IConfigurableOptions
         /// </summary>
         public List<string> IgnoreKeys { get; set; } = [];
     }
-}
-
-/// <summary>
-///     缓存类型枚举
-/// </summary>
-[Description("缓存类型枚举")]
-public enum CacheTypeEnum
-{
-    [Description("内存缓存")] Memory,
-
-    [Description("Redis缓存")] Redis
 }

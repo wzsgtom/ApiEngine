@@ -16,22 +16,6 @@ namespace ApiEngine.Application.Service;
 [ApiDescriptionSettings(Name = "auth", Version = "1")]
 public class AuthService(IHttpContextAccessor accessor) : IDynamicApiController, IScoped
 {
-    #region 私有方法
-
-    /// <summary>
-    ///     验证用户
-    /// </summary>
-    /// <param name="code"></param>
-    /// <param name="pwd"></param>
-    /// <returns></returns>
-    [NonAction]
-    private async Task AthensUser(string code, string pwd)
-    {
-        await Task.Delay(100);
-    }
-
-    #endregion
-
     /// <summary>
     ///     登录
     /// </summary>
@@ -39,22 +23,12 @@ public class AuthService(IHttpContextAccessor accessor) : IDynamicApiController,
     /// <returns></returns>
     public async Task Login(BaseDto<LoginDto> dto)
     {
-        await AthensUser(dto.User.Ucode, dto.Data.Pwd);
+        await Task.Delay(100);
 
-        // 生成Token令牌
-        var dict = dto.User.ToDictionary();
-
-        var accessToken = JWTEncryption.Encrypt(dict);
-
-        // 生成刷新Token令牌
+        var accessToken = JWTEncryption.Encrypt(dto.User.ToDictionary());
         var refreshToken = JWTEncryption.GenerateRefreshToken(accessToken, 480);
 
-        // 设置Swagger自动登录
-        accessor.HttpContext.SigninToSwagger(accessToken);
-
-        // 设置响应报文头
-        accessor.HttpContext!.Response.Headers["access-token"] = accessToken;
-        accessor.HttpContext!.Response.Headers["x-access-token"] = refreshToken;
+        accessor.HttpContext.SetTokensOfResponseHeaders(accessToken, refreshToken);
     }
 
     /// <summary>
@@ -64,7 +38,6 @@ public class AuthService(IHttpContextAccessor accessor) : IDynamicApiController,
     /// <returns></returns>
     public async Task ModifyPwd(BaseDto<ModifyPasswordDto> dto)
     {
-        await AthensUser(dto.User.Ucode, dto.Data.Pwd);
-        //await dbFunc.usp_czy_changepassword(dto.User.Ucode, dto.Data.NewPwd);
+        await Task.Delay(100);
     }
 }

@@ -1,7 +1,7 @@
-﻿using ApiEngine.Application.Dto;
+﻿using System.Security.Claims;
+using ApiEngine.Application.Dto;
 using Furion;
 using Furion.DistributedIDGenerator;
-using System.Security.Claims;
 
 namespace ApiEngine.Application.Util;
 
@@ -12,12 +12,12 @@ public class StaticFunc
         return App.User?.FindFirstValue(key);
     }
 
-    public static string TokenUser()
+    public static string TokenUCode()
     {
         return Token(nameof(UserClass.Ucode));
     }
 
-    public static string TokenUserName()
+    public static string TokenUName()
     {
         return Token(nameof(UserClass.Uname));
     }

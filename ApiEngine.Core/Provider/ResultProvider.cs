@@ -15,8 +15,7 @@ using SqlSugar;
 namespace ApiEngine.Core.Provider;
 
 [UnifyModel(typeof(RESTfulResult<>))]
-public class ResultProvider(ILogger<ResultProvider> logger, IOptionsMonitor<AppInfoOptions> options)
-    : IUnifyResultProvider
+public class ResultProvider(ILogger<ResultProvider> logger, IOptionsMonitor<AppInfoOptions> options) : IUnifyResultProvider
 {
     private readonly AppInfoOptions _options = options.CurrentValue;
 
@@ -30,9 +29,7 @@ public class ResultProvider(ILogger<ResultProvider> logger, IOptionsMonitor<AppI
     public IActionResult OnValidateFailed(ActionExecutingContext context, ValidationMetadata metadata)
     {
         //var errs = context.ModelState.Values.SelectMany(m => m.Errors).Select(m => m.ErrorMessage);
-        var result = NewResult(StatusCodes.Status400BadRequest,
-            data: metadata.Data,
-            errors: GenConst.MessagePrefix + metadata.Message);
+        var result = NewResult(StatusCodes.Status400BadRequest, data: metadata.Data, errors: GenConst.MessagePrefix + metadata.Message);
         Log(context, result);
         return new JsonResult(result, UnifyContext.GetSerializerSettings(context));
     }
@@ -41,10 +38,9 @@ public class ResultProvider(ILogger<ResultProvider> logger, IOptionsMonitor<AppI
     {
         var exception = metadata.Exception.GetTrue();
 
-        var result = NewResult(metadata.StatusCode, data: metadata.Data,
-            errors: GenConst.MessagePrefix + exception.Message);
+        var result = NewResult(metadata.StatusCode, data: metadata.Data, errors: GenConst.MessagePrefix + exception.Message);
         if (exception is not AppFriendlyException and not SqlSugarException)
-            logger.LogError(metadata.Exception, "{0}", metadata.Exception.Message);
+            logger.LogError(metadata.Exception, "{c}", metadata.Exception.Message);
 
         return new JsonResult(result, UnifyContext.GetSerializerSettings(context));
     }
@@ -53,17 +49,15 @@ public class ResultProvider(ILogger<ResultProvider> logger, IOptionsMonitor<AppI
     {
         var exception = metadata.Exception.GetTrue();
 
-        var result = NewResult(metadata.StatusCode, data: metadata.Data,
-            errors: GenConst.MessagePrefix + exception.Message);
+        var result = NewResult(metadata.StatusCode, data: metadata.Data, errors: GenConst.MessagePrefix + exception.Message);
         if (exception is not AppFriendlyException and not SqlSugarException)
-            logger.LogError(metadata.Exception, "{0}", metadata.Exception.Message);
+            logger.LogError(metadata.Exception, "{c}", metadata.Exception.Message);
 
         Log(context, result);
         return new JsonResult(result, UnifyContext.GetSerializerSettings(context));
     }
 
-    public async Task OnResponseStatusCodes(HttpContext context, int statusCode,
-        UnifyResultSettingsOptions unifyResultSettings = null)
+    public async Task OnResponseStatusCodes(HttpContext context, int statusCode, UnifyResultSettingsOptions unifyResultSettings = null)
     {
         UnifyContext.SetResponseStatusCodes(context, statusCode, unifyResultSettings);
         switch (statusCode)
@@ -92,12 +86,11 @@ public class ResultProvider(ILogger<ResultProvider> logger, IOptionsMonitor<AppI
 
         if (!allowLog) return;
 
-        if (result.Succeeded && _options.Log.Response) logger.LogInformation("{0}", result.ToJson());
-        else logger.LogError("{0}", result.ToJson());
+        if (result.Succeeded && _options.Log.Response) logger.LogInformation("{c}", result.ToJson());
+        else logger.LogError("{c}", result.ToJson());
     }
 
-    private static RESTfulResult<object> NewResult(int statusCode, bool succeeded = false, object data = null,
-        object errors = null)
+    private static RESTfulResult<object> NewResult(int statusCode, bool succeeded = false, object data = null, object errors = null)
     {
         var result = new RESTfulResult<object>
         {

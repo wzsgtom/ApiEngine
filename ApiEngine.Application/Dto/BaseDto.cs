@@ -1,5 +1,5 @@
-﻿using ApiEngine.Core.Gen;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using ApiEngine.Core.Gen;
 
 namespace ApiEngine.Application.Dto;
 
@@ -52,4 +52,10 @@ public class UserClass
     [Display(Name = "用户姓名")]
     [Required(ErrorMessage = GenConst.RequiredPrompt)]
     public string Uname { get; init; }
+
+    /// <summary>
+    ///     使用时间
+    /// </summary>
+    [Display(Name = "使用时间")]
+    public DateTime UDateTime { get; init; } = DateTime.Now;
 }

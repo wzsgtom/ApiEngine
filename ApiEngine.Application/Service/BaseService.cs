@@ -1,4 +1,5 @@
-﻿using ApiEngine.Application.Service.BaseServiceDto;
+﻿using System.ComponentModel.DataAnnotations;
+using ApiEngine.Application.Service.BaseServiceDto;
 using ApiEngine.Application.Util;
 using ApiEngine.Core.Database.SqlSugar;
 using ApiEngine.Core.Extension;
@@ -6,7 +7,6 @@ using Furion.DependencyInjection;
 using Furion.DynamicApiController;
 using Microsoft.AspNetCore.Mvc;
 using SqlSugar;
-using System.ComponentModel.DataAnnotations;
 using Yitter.IdGenerator;
 
 namespace ApiEngine.Application.Service;
@@ -40,10 +40,10 @@ public class BaseService(ISqlSugarClient db, DbFunc dbFunc) : IDynamicApiControl
     /// </summary>
     /// <param name="dto"></param>
     /// <returns></returns>
-    public async Task<List<dynamic>> DynamicTableQuery([Required] DynamicTableQueryDto dto)
+    public async Task<List<object>> DynamicTableQuery([Required] DynamicTableQueryDto dto)
     {
         // 创建查询对象
-        var queryable = db.Queryable<dynamic>().AS(dto.Name, "t1");
+        var queryable = db.Queryable<object>().AS(dto.Name, "t1");
 
         // 添加关联表信息
         if (dto.JoinInfos?.Count > 0)
@@ -52,7 +52,7 @@ public class BaseService(ISqlSugarClient db, DbFunc dbFunc) : IDynamicApiControl
                     dtoJoinInfo.JoinWhere, dtoJoinInfo.JoinType));
 
         // 选择需要查询的字段
-        queryable.Select<dynamic>(dto.QueryFields is { Count: > 0 } ? dto.QueryFields.StringJoin() : "t1.*");
+        queryable.Select<object>(dto.QueryFields is { Count: > 0 } ? dto.QueryFields.StringJoin() : "t1.*");
 
         // 将 JSON 字符串转换为条件模型
         var conditionalModels = db.Utilities.JsonToConditionalModels(dto.Json);

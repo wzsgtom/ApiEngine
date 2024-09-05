@@ -1,4 +1,5 @@
-﻿using ApiEngine.Core.Database.SqlSugar;
+﻿using System.IO.Compression;
+using ApiEngine.Core.Database.SqlSugar;
 using ApiEngine.Core.Handler;
 using ApiEngine.Core.Option;
 using AspNetCoreRateLimit;
@@ -11,7 +12,6 @@ using Microsoft.Extensions.DependencyInjection;
 using NewLife.Caching;
 using NewLife.Log;
 using SqlSugar;
-using System.IO.Compression;
 
 namespace ApiEngine.Core.Extension;
 
@@ -33,27 +33,18 @@ public static class ServiceExtension
     internal static void SetCache(this IServiceCollection services)
     {
         var cacheOptions = App.GetOptions<AppInfoOptions>().Cache;
-        switch (cacheOptions.CacheType)
+        if (cacheOptions.Redis is not null)
         {
-            case CacheTypeEnum.Redis:
-                var rds = new FullRedis(new RedisOptions
-                {
-                    Configuration = cacheOptions.Redis.Configuration,
-                    Prefix = cacheOptions.Redis.Prefix
-                });
-
+            var rds = new FullRedis(cacheOptions.Redis);
 #if DEBUG
-                XTrace.UseConsole();
-                rds.Log = XTrace.Log;
-                rds.ClientLog = XTrace.Log; // 调试日志，正式使用时注释
+            XTrace.UseConsole();
+            rds.Log = XTrace.Log;
+            rds.ClientLog = XTrace.Log; // 调试日志，正式使用时注释
 #endif
-                services.AddSingleton((ICache)rds);
-                break;
-            case CacheTypeEnum.Memory:
-            default:
-                services.AddSingleton(Cache.Default);
-                break;
+            Cache.Default = rds;
         }
+
+        services.AddSingleton(Cache.Default);
     }
 
     /// <summary>

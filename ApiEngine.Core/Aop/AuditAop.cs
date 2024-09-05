@@ -15,7 +15,7 @@ public class AuditAop(ILogger<AuditAop> logger, IOptionsMonitor<AppInfoOptions> 
         var allowLog = !options.CurrentValue.Log.IgnoreKeys.Exists(requestUrl.Contains);
 
         if (context.ActionArguments.Count > 0 && options.CurrentValue.Log.Request && allowLog)
-            logger.LogInformation("{0}", context.ActionArguments.ToJson());
+            logger.LogInformation("{c}", context.ActionArguments.ToJson());
 
         return base.OnActionExecutionAsync(context, next);
     }

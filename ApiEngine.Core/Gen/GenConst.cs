@@ -13,6 +13,6 @@ public class GenConst
     public const string Time17 = "yyyyMMddHHmmssfff";
     public const string Time17Format = "yyyy-MM-dd HH:mm:ss.fff";
 
-    public const string MessagePrefix = "综合服务平台 —> ";
+    public const string MessagePrefix = "API服务平台 —> ";
     public const string RequiredPrompt = "{0}不能为空";
 }

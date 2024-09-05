@@ -43,8 +43,7 @@ public class JwtHandler : AppAuthorizeHandler
     /// <param name="context"></param>
     /// <param name="httpContext"></param>
     /// <returns></returns>
-    private static async Task<bool> CheckAuthorizeAsync(AuthorizationHandlerContext context,
-        DefaultHttpContext httpContext)
+    private static async Task<bool> CheckAuthorizeAsync(AuthorizationHandlerContext context, DefaultHttpContext httpContext)
     {
         //foreach (var requirement in context.Requirements)
         //{

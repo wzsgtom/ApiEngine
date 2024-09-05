@@ -1,9 +1,12 @@
-﻿using Furion.DependencyInjection;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
+using Furion.DependencyInjection;
 using Furion.DynamicApiController;
 using Furion.EventBus;
+using Furion.FriendlyException;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
+using NewLife.Caching;
 
 namespace ApiEngine.Application.Service;
 
@@ -11,8 +14,25 @@ namespace ApiEngine.Application.Service;
 ///     测试
 /// </summary>
 [ApiDescriptionSettings(Name = "test")]
-public class TestSetvice(IEventPublisher eventP) : IDynamicApiController, IScoped
+[AllowAnonymous]
+public class TestSetvice(IEventPublisher eventP, ICache cache) : IDynamicApiController, IScoped
 {
+    public void InitBuy()
+    {
+        cache.Set("Xxx", 1000);
+    }
+
+    public string Buy()
+    {
+        const string key = "Xxx";
+        using var ck = cache.AcquireLock(key + "Lock", 3000);
+
+        if (cache.Get<int>(key) <= 0) throw Oops.Bah("缺货！！！");
+
+        cache.Decrement(key, 1);
+        return "下单成功";
+    }
+
     public object Test(bool gc = false)
     {
         if (gc) GC.Collect();
