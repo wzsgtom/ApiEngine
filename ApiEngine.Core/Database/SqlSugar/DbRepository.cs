@@ -7,7 +7,7 @@ namespace ApiEngine.Core.Database.SqlSugar;
 ///     仓储模式
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public class DbRepository<T> : SimpleClient<T> where T : class, new()
+public sealed class DbRepository<T> : SimpleClient<T> where T : class, new()
 {
     public DbRepository(ISqlSugarClient context) : base(context)
     {

@@ -15,7 +15,7 @@ namespace ApiEngine.Application.Service;
 /// </summary>
 [ApiDescriptionSettings(Name = "test")]
 [AllowAnonymous]
-public class TestSetvice(IEventPublisher eventP, ICache cache) : IDynamicApiController, IScoped
+public class TestService(IEventPublisher eventP, ICache cache) : IDynamicApiController, IScoped
 {
     public void InitBuy()
     {
@@ -31,18 +31,6 @@ public class TestSetvice(IEventPublisher eventP, ICache cache) : IDynamicApiCont
 
         cache.Decrement(key, 1);
         return "下单成功";
-    }
-
-    public object Test(bool gc = false)
-    {
-        if (gc) GC.Collect();
-
-        var process = Process.GetCurrentProcess();
-
-        var workingSet = process.WorkingSet64; // 工作集大小（字节）
-        var privateBytes = process.PrivateMemorySize64; // 私有的内存大小（字节）
-
-        return new { workingSetMb = workingSet / 1024.0 / 1024.0, privateBytesMb = privateBytes / 1024.0 / 1024.0 };
     }
 
     public async Task TestPublishEvent([Required] string name)
