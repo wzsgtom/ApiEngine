@@ -1,5 +1,4 @@
-﻿using System.IO.Compression;
-using ApiEngine.Core.Database.SqlSugar;
+﻿using ApiEngine.Core.Database.SqlSugar;
 using ApiEngine.Core.Handler;
 using ApiEngine.Core.Option;
 using AspNetCoreRateLimit;
@@ -12,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NewLife.Caching;
 using NewLife.Log;
 using SqlSugar;
+using System.IO.Compression;
 
 namespace ApiEngine.Core.Extension;
 

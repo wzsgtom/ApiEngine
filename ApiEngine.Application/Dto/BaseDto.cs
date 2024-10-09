@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
-using ApiEngine.Core.Gen;
+﻿using ApiEngine.Core.Gen;
+using System.ComponentModel.DataAnnotations;
 
 namespace ApiEngine.Application.Dto;
 
