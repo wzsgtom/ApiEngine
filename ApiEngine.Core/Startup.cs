@@ -35,7 +35,7 @@ public class Startup : AppStartup
         // 设置数据库
         services.SetSqlSugar();
         // 远程请求
-        services.AddRemoteRequest();
+        services.AddHttpRemote();
         // JWT授权
         services.AddJwt<JwtHandler>(enableGlobalAuthorize: App.GetOptions<AppInfoOptions>().GlobalAuthorize);
         // 审计
