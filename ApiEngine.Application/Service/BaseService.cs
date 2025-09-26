@@ -5,6 +5,7 @@ using ApiEngine.Core.Extension;
 using Furion.DependencyInjection;
 using Furion.DynamicApiController;
 using Microsoft.AspNetCore.Mvc;
+using NewLife;
 using SqlSugar;
 using System.ComponentModel.DataAnnotations;
 using Yitter.IdGenerator;
@@ -55,8 +56,11 @@ public class BaseService(ISqlSugarClient db, DbFunc dbFunc) : IDynamicApiControl
         queryable.Select<object>(dto.QueryFields is { Count: > 0 } ? dto.QueryFields.StringJoin() : "t1.*");
 
         // 将 JSON 字符串转换为条件模型
-        var conditionalModels = db.Utilities.JsonToConditionalModels(dto.Json);
-        if (conditionalModels.Count > 0) queryable.Where(conditionalModels);
+        var conditionals = db.Utilities.JsonToConditionalModels(dto.Json);
+        if (conditionals.Count > 0) queryable.Where(conditionals);
+
+        // 拼接查询条件
+        queryable.WhereIF(!dto.WhereString.IsNullOrEmpty(), dto.WhereString);
 
         // 根据排序字段进行排序
         if (dto.OrderFields is { Count: > 0 }) queryable.OrderBy(dto.OrderFields.StringJoin());

@@ -20,6 +20,11 @@ public class DynamicTableQueryDto : IValidatableObject
     public required string Json { get; set; }
 
     /// <summary>
+    ///     查询条件
+    /// </summary>
+    public string WhereString { get; set; }
+
+    /// <summary>
     ///     查询字段
     /// </summary>
     public List<string> QueryFields { get; set; }
