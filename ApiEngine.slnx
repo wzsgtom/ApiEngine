@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Solution xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Project Path="ApiEngine.Web.Entry/ApiEngine.Web.Entry.csproj" Guid="72DA2941-0A76-4607-B99B-C168C8DFE8DD" TypeGuid="9A19103F-16F7-4668-BE54-9A1E7A4F7556" Name="ApiEngine.Web.Entry" />
+  <Project Path="ApiEngine.Core/ApiEngine.Core.csproj" Guid="9AC0069C-9EBB-44BC-A433-33EDF96F5CAD" TypeGuid="9A19103F-16F7-4668-BE54-9A1E7A4F7556" Name="ApiEngine.Core" />
+  <Project Path="ApiEngine.Application/ApiEngine.Application.csproj" Guid="00FA9936-9BE0-431E-8822-424D445AC143" TypeGuid="9A19103F-16F7-4668-BE54-9A1E7A4F7556" Name="ApiEngine.Application" />
+  <Configurations>
+    <Configuration Name="Debug" Platform="Any CPU" />
+    <Configuration Name="Release" Platform="Any CPU" />
+  </Configurations>
+  <Properties>
+    <Property Name="HideSolutionNode" Value="false" />
+    <Property Name="SolutionGuid" Value="A8C4C793-8381-4F89-99C4-677C5E69333F" />
+  </Properties>
+</Solution>
