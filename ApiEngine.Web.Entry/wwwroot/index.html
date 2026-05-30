@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>接口表单</title>
+    <link rel="stylesheet" href="./css/bootstrap.min.css">
+    <link rel="stylesheet" href="./css/api-form.css">
+</head>
+<body class="bg-body-tertiary">
+<input id="baseUrl" type="hidden">
+<input id="docUrl" type="hidden">
+<button id="reloadDoc" class="d-none" type="button">刷新</button>
+
+<header class="definition-bar bg-white border-bottom">
+    <nav id="definitionTabs" class="group-tabs nav nav-pills flex-nowrap overflow-auto" aria-label="接口定义"></nav>
+    <div class="definition-meta">
+        <span id="docStatus" class="text-muted small">正在读取接口文档...</span>
+        <a class="btn btn-outline-secondary btn-sm" href="/api/index.html" target="_blank" rel="noreferrer">Swagger</a>
+    </div>
+</header>
+
+<main class="container-fluid py-1">
+    <div class="row g-1 align-items-stretch app-grid">
+        <section class="col-12 col-xl-6" aria-label="请求表单">
+            <div class="card request-pane">
+                <div class="card-body p-1">
+                    <div class="request-head d-grid gap-1">
+                        <label class="endpoint-select mb-0">
+                            <span class="form-label small mb-1">接口</span>
+                            <select id="endpointSelect" class="form-select form-select-sm"></select>
+                        </label>
+                        <button id="sendRequest" class="btn btn-success btn-sm" type="button">发送请求</button>
+                    </div>
+
+                    <div class="form-scroll mt-1">
+                        <section class="form-section">
+                            <h2 class="section-title section-title-action">
+                                <span>请求头</span>
+                                <button id="addHeader" class="btn btn-outline-secondary btn-sm" type="button">新增</button>
+                            </h2>
+                            <div id="requestHeaderList" class="header-list"></div>
+                        </section>
+
+                        <section id="parameterSection" class="form-section hidden">
+                            <h2 class="section-title">路径与查询参数</h2>
+                            <div id="parameterRoot" class="field-list"></div>
+                        </section>
+
+                        <section class="form-section mt-1">
+                            <h2 class="section-title">请求参数</h2>
+                            <div id="formRoot" class="field-list"></div>
+                        </section>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <section class="col-12 col-xl-6 right-pane" aria-label="JSON">
+            <div class="card json-pane">
+                <div class="card-body p-1">
+                    <div class="response-head d-flex justify-content-between gap-2 align-items-baseline">
+                        <h2 class="section-title mb-0">入参 JSON <span class="editable-badge">可编辑</span></h2>
+                        <span id="jsonStatus" class="text-muted small">可直接编辑，合法 JSON 会同步表单</span>
+                        <button id="copyJson" class="btn btn-outline-secondary btn-sm" type="button">复制</button>
+                    </div>
+                    <textarea id="jsonPreview" class="form-control form-control-sm code-area mt-1" spellcheck="false" placeholder="可以直接编辑 JSON，格式正确后会同步到左侧表单。"></textarea>
+                </div>
+            </div>
+
+            <div class="card response-pane">
+                <div class="card-body p-1">
+                    <div class="response-head d-flex justify-content-between gap-2 align-items-baseline">
+                        <h2 class="section-title mb-0">出参 JSON</h2>
+                        <p id="responseMeta" class="text-muted small mb-0">尚未请求。</p>
+                        <button id="copyResponse" class="btn btn-outline-secondary btn-sm" type="button">复制</button>
+                    </div>
+                    <pre id="responseViewer" class="mt-1 mb-0">尚未请求。</pre>
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
+
+<script src="./js/api-form.js"></script>
+</body>
+</html>
