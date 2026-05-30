@@ -182,6 +182,22 @@ main.container-fluid {
     line-height: 1.2;
 }
 
+.cache-switch {
+    display: inline-flex;
+    gap: .35rem;
+    align-items: center;
+    min-height: 0;
+    color: #495057;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.cache-switch .form-check-input {
+    width: 2.1em;
+    height: 1.05em;
+    margin: 0;
+}
+
 .header-list {
     display: grid;
     gap: .25rem;

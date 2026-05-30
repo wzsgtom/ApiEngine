@@ -25,8 +25,8 @@
         activeDefinitionUrl: "",
         selected: null,
         formValue: null,
+        parameterValues: {},
         detailOpen: {},
-        authToken: "",
         requestHeaders: [],
         stored: {}
     };
@@ -39,12 +39,13 @@
     function init() {
         bindElements();
         state.stored = loadStore();
-        state.authToken = state.stored.accessToken || state.stored.token || "";
         state.requestHeaders = normalizeHeaders(state.stored.headers);
-        if (state.authToken) {
+        const storedToken = state.stored.accessToken || state.stored.token || "";
+        if (storedToken) {
             removeRequestHeader(accessTokenHeader);
-            upsertRequestHeader(authorizationHeader, normalizeAccessTokenValue(state.authToken), false);
+            upsertRequestHeader(authorizationHeader, normalizeAccessTokenValue(storedToken), false);
         }
+        el.cacheParameters.checked = state.stored.cacheParameters === true;
         el.baseUrl.value = state.stored.baseUrl || getOrigin();
         el.docUrl.value = state.stored.docUrl || docCandidates[0];
         bindEvents();
@@ -64,6 +65,7 @@
             "sendRequest",
             "addHeader",
             "requestHeaderList",
+            "cacheParameters",
             "parameterSection",
             "parameterRoot",
             "formRoot",
@@ -82,6 +84,13 @@
         el.reloadDoc.addEventListener("click", discoverDefinitions);
         el.baseUrl.addEventListener("change", persistSettings);
         el.docUrl.addEventListener("change", persistSettings);
+        el.cacheParameters.addEventListener("change", () => {
+            if (state.selected) {
+                persistSelectionState();
+            } else {
+                persistSettings();
+            }
+        });
         el.addHeader.addEventListener("click", () => {
             syncHeaderInputs();
             state.requestHeaders.push({ name: "", value: "" });
@@ -162,7 +171,7 @@
                 updatePageTitle(spec, definition);
                 persistSettings();
                 renderEndpointOptions();
-                selectEndpoint(state.endpoints.find((item) => item.bodyInfo) || state.endpoints[0]);
+                selectEndpoint(getInitialEndpoint());
                 setStatus(`已加载 ${definition.name}，共 ${state.endpoints.length} 个接口。`);
                 return;
             } catch (error) {
@@ -291,30 +300,42 @@
         `).join("");
     }
 
+    function getInitialEndpoint() {
+        const rememberedId = state.stored.selectedEndpoints?.[state.activeDefinitionUrl];
+        return state.endpoints.find((item) => item.id === rememberedId)
+            || state.endpoints[0];
+    }
+
     function selectEndpoint(endpoint) {
         if (!endpoint) {
             enterEmptyState();
             return;
         }
 
+        const saved = isParameterCacheEnabled() ? getEndpointState(endpoint) : {};
         state.selected = endpoint;
         el.endpointSelect.value = endpoint.id;
         state.detailOpen = {};
+        state.parameterValues = { ...(saved.parameters || {}) };
 
-        state.formValue = endpoint.bodyInfo && endpoint.bodyInfo.schema
-            ? sampleFromSchema(endpoint.bodyInfo.schema, "body", new Set())
-            : null;
+        state.formValue = Object.prototype.hasOwnProperty.call(saved, "formValue")
+            ? cloneJson(saved.formValue)
+            : endpoint.bodyInfo && endpoint.bodyInfo.schema
+                ? sampleFromSchema(endpoint.bodyInfo.schema, "body", new Set())
+                : null;
 
         renderParameterForm(endpoint.parameters);
         renderBodyForm();
         updateJsonPreview();
         el.responseMeta.textContent = "尚未请求。";
         el.responseViewer.textContent = "尚未请求。";
+        persistSelectionState();
     }
 
     function enterEmptyState() {
         state.selected = null;
         state.formValue = null;
+        state.parameterValues = {};
         state.detailOpen = {};
         el.endpointSelect.innerHTML = `<option value="">无接口</option>`;
         el.parameterSection.classList.add("hidden");
@@ -345,7 +366,6 @@
             button.addEventListener("click", () => {
                 syncHeaderInputs();
                 state.requestHeaders.splice(Number(button.dataset.headerRemove), 1);
-                syncTokenFromHeaders();
                 renderRequestHeaders();
                 persistSettings();
             });
@@ -366,12 +386,6 @@
             }
         });
         state.requestHeaders = next;
-        syncTokenFromHeaders();
-    }
-
-    function syncTokenFromHeaders() {
-        const tokenHeader = state.requestHeaders.find((header) => sameHeaderName(header.name, authorizationHeader));
-        state.authToken = tokenHeader ? tokenHeader.value : "";
     }
 
     function normalizeHeaders(headers) {
@@ -394,7 +408,6 @@
         } else {
             state.requestHeaders.push({ name, value });
         }
-        syncTokenFromHeaders();
         if (shouldRender) {
             renderRequestHeaders();
         }
@@ -417,6 +430,7 @@
             const schema = materializeSchema(parameter.schema || {}, new Set());
             const title = strip(parameter.description || schema.description || friendlyNames[parameter.name] || parameter.name);
             const required = parameter.required ? `<span class="required">必填</span>` : "";
+            const value = state.parameterValues[parameterKey(parameter)] ?? sampleParameter(parameter);
             return `
                 <div class="field-row">
                     <div class="field-main">
@@ -424,9 +438,34 @@
                         <span class="field-code">${escapeHtml(parameter.name)} · ${escapeHtml(parameter.in)}</span>
                         ${required}
                     </div>
-                    <input data-param-name="${escapeHtml(parameter.name)}" data-param-in="${escapeHtml(parameter.in)}" type="text" value="${escapeHtml(sampleParameter(parameter))}" autocomplete="off" spellcheck="false">
+                    <input data-param-name="${escapeHtml(parameter.name)}" data-param-in="${escapeHtml(parameter.in)}" type="text" value="${escapeHtml(value)}" autocomplete="off" spellcheck="false">
                 </div>`;
         }).join("");
+
+        bindParameterEvents();
+    }
+
+    function bindParameterEvents() {
+        el.parameterRoot.querySelectorAll("[data-param-name]").forEach((input) => {
+            input.addEventListener("input", () => {
+                syncParameterValues();
+                persistSelectionState();
+            });
+        });
+    }
+
+    function syncParameterValues() {
+        const values = {};
+        el.parameterRoot.querySelectorAll("[data-param-name]").forEach((input) => {
+            values[parameterKey(input.dataset)] = input.value;
+        });
+        state.parameterValues = values;
+    }
+
+    function parameterKey(parameter) {
+        const scope = parameter.in ?? parameter.paramIn;
+        const name = parameter.name ?? parameter.paramName;
+        return `${scope}:${name}`;
     }
 
     function renderBodyForm() {
@@ -668,6 +707,7 @@
             ? ""
             : JSON.stringify(state.formValue, null, 2);
         setJsonStatus(state.formValue === null || state.formValue === undefined ? "当前接口无入参 JSON。" : "已根据表单更新。", "muted");
+        persistSelectionState();
     }
 
     function syncJsonToForm() {
@@ -698,6 +738,7 @@
 
         state.formValue = parsed;
         renderBodyForm();
+        persistSelectionState();
         setJsonStatus("已同步到表单。", "success");
     }
 
@@ -816,15 +857,19 @@
         });
     }
 
+    function requestHeaderValue(name) {
+        return state.requestHeaders.find((header) => sameHeaderName(header.name, name))?.value || "";
+    }
+
     function storeResponseToken(response) {
         const token = response.headers.get(accessTokenHeader);
         if (!token) {
             return false;
         }
 
-        state.authToken = normalizeAccessTokenValue(token);
+        const authorization = normalizeAccessTokenValue(token);
         removeRequestHeader(accessTokenHeader);
-        upsertRequestHeader(authorizationHeader, state.authToken, true);
+        upsertRequestHeader(authorizationHeader, authorization, true);
         persistSettings();
         return true;
     }
@@ -1082,13 +1127,49 @@
         document.title = title ? `${title} - 接口表单` : "接口表单";
     }
 
+    function persistSelectionState() {
+        if (!state.selected || !state.activeDefinitionUrl) {
+            return;
+        }
+
+        syncParameterValues();
+        const selectedEndpoints = state.stored.selectedEndpoints || (state.stored.selectedEndpoints = {});
+        const endpointStates = state.stored.endpointStates || (state.stored.endpointStates = {});
+        const endpointKey = endpointStorageKey(state.selected);
+        selectedEndpoints[state.activeDefinitionUrl] = state.selected.id;
+        if (isParameterCacheEnabled()) {
+            endpointStates[endpointKey] = {
+                formValue: cloneJson(state.formValue),
+                parameters: { ...state.parameterValues }
+            };
+        } else {
+            delete endpointStates[endpointKey];
+        }
+        persistSettings();
+    }
+
+    function getEndpointState(endpoint) {
+        return state.stored.endpointStates?.[endpointStorageKey(endpoint)] || {};
+    }
+
+    function endpointStorageKey(endpoint) {
+        return `${state.activeDefinitionUrl}::${endpoint.id}`;
+    }
+
+    function isParameterCacheEnabled() {
+        return el.cacheParameters?.checked === true;
+    }
+
     function persistSettings() {
         state.stored = {
             baseUrl: el.baseUrl.value.trim(),
             docUrl: el.docUrl.value.trim(),
             definitionUrl: state.activeDefinitionUrl,
-            accessToken: state.authToken,
-            headers: state.requestHeaders
+            accessToken: requestHeaderValue(authorizationHeader),
+            headers: state.requestHeaders,
+            cacheParameters: isParameterCacheEnabled(),
+            selectedEndpoints: state.stored.selectedEndpoints || {},
+            endpointStates: state.stored.endpointStates || {}
         };
         try {
             localStorage.setItem(storeKey, JSON.stringify(state.stored));
@@ -1190,6 +1271,13 @@
 
     function isPlainObject(value) {
         return Object.prototype.toString.call(value) === "[object Object]";
+    }
+
+    function cloneJson(value) {
+        if (value === undefined) {
+            return undefined;
+        }
+        return JSON.parse(JSON.stringify(value));
     }
 
     function sameHeaderName(left, right) {
